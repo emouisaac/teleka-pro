@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Dashboard - Transport Management System</title>
+    <link rel="stylesheet" href="driver-dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Login/Registration Modal -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeAuth">&times;</span>
+            <div class="auth-container">
+                <div class="auth-tabs">
+                    <button class="tab-btn active" id="loginTab">Login</button>
+                    <button class="tab-btn" id="registerTab">Register</button>
+                </div>
+                <div id="loginForm" class="auth-form">
+                    <h2>Driver Login</h2>
+                    <form id="loginFormData">
+                        <div class="form-group">
+                            <label for="loginEmail">Email</label>
+                            <input type="email" id="loginEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword">Password</label>
+                            <input type="password" id="loginPassword" required>
+                        </div>
+                        <button type="submit" class="btn-primary">Login</button>
+                    </form>
+                </div>
+                <div id="registerForm" class="auth-form hidden">
+                    <h2>Driver Registration</h2>
+                    <form id="registerFormData">
+                        <div class="form-group">
+                            <label for="regName">Full Name</label>
+                            <input type="text" id="regName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="regEmail">Email</label>
+                            <input type="email" id="regEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="regPhone">Phone</label>
+                            <input type="tel" id="regPhone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="regLicense">License Number</label>
+                            <input type="text" id="regLicense" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="regPassword">Password</label>
+                            <input type="password" id="regPassword" required>
+                        </div>
+                        <button type="submit" class="btn-primary">Register</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div class="dashboard-container" id="dashboardContainer" style="display: none;">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>TELEKA</h1>
+            </div>
+            <div class="header-right">
+                <div class="notification-bell">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-count" id="notificationCount">0</span>
+                </div>
+                <div class="user-profile">
+                    <img src="https://via.placeholder.com/40" alt="Driver" id="driverAvatar">
+                    <span id="driverName">John Doe</span>
+                    <div class="user-dropdown">
+                        <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <nav class="sidebar-nav">
+                <a href="#dashboard" class="nav-item active" data-section="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#statistics" class="nav-item" data-section="statistics">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Statistics</span>
+                </a>
+                <a href="#trips" class="nav-item" data-section="trips">
+                    <i class="fas fa-route"></i>
+                    <span>Available Trips</span>
+                </a>
+                <a href="#history" class="nav-item" data-section="history">
+                    <i class="fas fa-history"></i>
+                    <span>Trip History</span>
+                </a>
+                <a href="#profile" class="nav-item" data-section="profile">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </a>
+                <a href="#settings" class="nav-item" data-section="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+                <a href="#earnings" class="nav-item" data-section="earnings">
+                    <i class="fas fa-dollar-sign"></i>
+                    <span>Earnings</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboardSection" class="content-section active">
+                <div class="dashboard-main">
+                    <!-- Status and Controls -->
+                    <div class="status-panel">
+                        <div class="online-toggle">
+                            <label class="toggle-label">
+                                <input type="checkbox" id="onlineToggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="status-text" id="statusText">Offline</span>
+                        </div>
+                        <div class="current-status">
+                            <div class="status-indicator" id="statusIndicator">
+                                <i class="fas fa-circle"></i>
+                                <span>Offline</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Map Container -->
+                    <div class="map-container">
+                        <div id="map" class="map">
+                            <!-- Map will be rendered here -->
+                            <div class="map-placeholder">
+                                <i class="fas fa-map-marked-alt"></i>
+                                <p>Map View</p>
+                                <small>Interactive map will be displayed here</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Trip Management Panel -->
+                    <div class="trip-management">
+                        <div class="finding-trips" id="findingTrips">
+                            <div class="finding-animation">
+                                <i class="fas fa-search"></i>
+                                <div class="pulse-ring"></div>
+                            </div>
+                            <h3>Finding Trips...</h3>
+                            <p>Looking for available passengers in your area</p>
+                        </div>
+
+                        <div class="active-trip" id="activeTrip" style="display: none;">
+                            <div class="trip-card">
+                                <div class="trip-header">
+                                    <h3>New Trip Request</h3>
+                                    <div class="trip-timer" id="tripTimer">
+                                        <i class="fas fa-clock"></i>
+                                        <span id="timerValue">30</span>s
+                                    </div>
+                                </div>
+                                <div class="trip-details">
+                                    <div class="trip-route">
+                                        <div class="route-point pickup">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            <span id="pickupAddress">123 Main St, City</span>
+                                        </div>
+                                        <div class="route-arrow">
+                                            <i class="fas fa-arrow-down"></i>
+                                        </div>
+                                        <div class="route-point dropoff">
+                                            <i class="fas fa-map-marker"></i>
+                                            <span id="dropoffAddress">456 Oak Ave, City</span>
+                                        </div>
+                                    </div>
+                                    <div class="trip-info">
+                                        <div class="info-item">
+                                            <i class="fas fa-route"></i>
+                                            <span id="tripDistance">5.2 km</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <i class="fas fa-clock"></i>
+                                            <span id="tripDuration">15 min</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <i class="fas fa-dollar-sign"></i>
+                                            <span id="tripFare">$25.50</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="trip-actions" id="tripActions">
+                                    <button class="btn-success" id="acceptTripBtn">
+                                        <i class="fas fa-check"></i> Accept Trip
+                                    </button>
+                                    <button class="btn-danger" id="declineTripBtn">
+                                        <i class="fas fa-times"></i> Decline
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accepted-trip" id="acceptedTrip" style="display: none;">
+                            <div class="trip-card">
+                                <div class="trip-header">
+                                    <h3>Trip Accepted</h3>
+                                    <div class="passenger-info">
+                                        <i class="fas fa-user"></i>
+                                        <span id="passengerName">Alice Johnson</span>
+                                    </div>
+                                </div>
+                                <div class="trip-details">
+                                    <div class="trip-route">
+                                        <div class="route-point pickup">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            <span id="acceptedPickup">123 Main St, City</span>
+                                        </div>
+                                        <div class="route-arrow">
+                                            <i class="fas fa-arrow-down"></i>
+                                        </div>
+                                        <div class="route-point dropoff">
+                                            <i class="fas fa-map-marker"></i>
+                                            <span id="acceptedDropoff">456 Oak Ave, City</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="trip-actions">
+                                    <button class="btn-primary" id="startTripBtn">
+                                        <i class="fas fa-play"></i> Start Trip
+                                    </button>
+                                    <button class="btn-secondary" id="cancelTripBtn">
+                                        <i class="fas fa-times"></i> Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ongoing-trip" id="ongoingTrip" style="display: none;">
+                            <div class="trip-card">
+                                <div class="trip-header">
+                                    <h3>Trip in Progress</h3>
+                                    <div class="trip-timer">
+                                        <i class="fas fa-clock"></i>
+                                        <span id="ongoingTimer">00:00:00</span>
+                                    </div>
+                                </div>
+                                <div class="trip-details">
+                                    <div class="trip-route">
+                                        <div class="route-point pickup">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            <span id="ongoingPickup">123 Main St, City</span>
+                                        </div>
+                                        <div class="route-arrow">
+                                            <i class="fas fa-arrow-down"></i>
+                                        </div>
+                                        <div class="route-point dropoff">
+                                            <i class="fas fa-map-marker"></i>
+                                            <span id="ongoingDropoff">456 Oak Ave, City</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="trip-actions">
+                                    <button class="btn-success" id="endTripBtn">
+                                        <i class="fas fa-flag-checkered"></i> End Trip
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="trip-completed" id="tripCompleted" style="display: none;">
+                            <div class="trip-card">
+                                <div class="trip-header">
+                                    <h3>Trip Completed</h3>
+                                </div>
+                                <div class="trip-summary">
+                                    <div class="summary-item">
+                                        <span class="label">Distance:</span>
+                                        <span id="completedDistance">5.2 km</span>
+                                    </div>
+                                    <div class="summary-item">
+                                        <span class="label">Duration:</span>
+                                        <span id="completedDuration">15 min</span>
+                                    </div>
+                                    <div class="summary-item">
+                                        <span class="label">Fare:</span>
+                                        <span id="completedFare">$25.50</span>
+                                    </div>
+                                </div>
+                                <div class="trip-actions">
+                                    <button class="btn-primary" id="collectCashBtn">
+                                        <i class="fas fa-money-bill-wave"></i> Collect Cash
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Statistics Section -->
+            <section id="statisticsSection" class="content-section">
+                <h2>Statistics</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="rating">4.8</h3>
+                            <p>Rating</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="acceptanceRate">95%</h3>
+                            <p>Acceptance Rate</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-route"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalTrips">247</h3>
+                            <p>Total Trips</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="earnings">$1,250</h3>
+                            <p>This Month</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="recent-activity">
+                    <h3>Recent Activity</h3>
+                    <div class="activity-list" id="activityList">
+                        <!-- Activity items will be populated by JS -->
+                    </div>
+                </div>
+            </section>
+            <section id="tripsSection" class="content-section">
+                <h2>Available Trips</h2>
+                <div class="trips-list" id="tripsList">
+                    <!-- Trip cards will be populated by JS -->
+                </div>
+            </section>
+
+            <!-- History Section -->
+            <section id="historySection" class="content-section">
+                <h2>Trip History</h2>
+                <div class="history-filters">
+                    <select id="historyFilter">
+                        <option value="all">All Trips</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                    <input type="date" id="historyDate">
+                </div>
+                <div class="history-list" id="historyList">
+                    <!-- History items will be populated by JS -->
+                </div>
+            </section>
+
+            <!-- Profile Section -->
+            <section id="profileSection" class="content-section">
+                <h2>Driver Profile</h2>
+                <div class="profile-container">
+                    <div class="profile-avatar">
+                        <img src="https://via.placeholder.com/150" alt="Driver" id="profileAvatar">
+                        <button class="btn-secondary" id="changeAvatar">Change Photo</button>
+                    </div>
+                    <div class="profile-info">
+                        <form id="profileForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="profileName">Full Name</label>
+                                    <input type="text" id="profileName" value="John Doe">
+                                </div>
+                                <div class="form-group">
+                                    <label for="profileEmail">Email</label>
+                                    <input type="email" id="profileEmail" value="john.doe@example.com">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="profilePhone">Phone</label>
+                                    <input type="tel" id="profilePhone" value="+1234567890">
+                                </div>
+                                <div class="form-group">
+                                    <label for="profileLicense">License Number</label>
+                                    <input type="text" id="profileLicense" value="DL123456789">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="profileVehicle">Vehicle</label>
+                                    <input type="text" id="profileVehicle" value="Toyota Camry - ABC123">
+                                </div>
+                                <div class="form-group">
+                                    <label for="profileStatus">Status</label>
+                                    <select id="profileStatus">
+                                        <option value="active">Active</option>
+                                        <option value="inactive">Inactive</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-primary">Update Profile</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settingsSection" class="content-section">
+                <h2>Settings</h2>
+                <div class="settings-container">
+                    <div class="setting-group">
+                        <h3>Notifications</h3>
+                        <div class="setting-item">
+                            <label for="emailNotif">Email Notifications</label>
+                            <input type="checkbox" id="emailNotif" checked>
+                        </div>
+                        <div class="setting-item">
+                            <label for="smsNotif">SMS Notifications</label>
+                            <input type="checkbox" id="smsNotif" checked>
+                        </div>
+                        <div class="setting-item">
+                            <label for="pushNotif">Push Notifications</label>
+                            <input type="checkbox" id="pushNotif">
+                        </div>
+                    </div>
+                    <div class="setting-group">
+                        <h3>Privacy</h3>
+                        <div class="setting-item">
+                            <label for="locationSharing">Location Sharing</label>
+                            <input type="checkbox" id="locationSharing" checked>
+                        </div>
+                        <div class="setting-item">
+                            <label for="profileVisibility">Profile Visibility</label>
+                            <select id="profileVisibility">
+                                <option value="public">Public</option>
+                                <option value="drivers">Drivers Only</option>
+                                <option value="private">Private</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="setting-group">
+                        <h3>Appearance</h3>
+                        <div class="setting-item">
+                            <label for="darkTheme">Dark Theme</label>
+                            <input type="checkbox" id="darkTheme">
+                        </div>
+                    </div>
+                    <div class="setting-group">
+                        <h3>Security</h3>
+                        <button class="btn-secondary" id="changePassword">Change Password</button>
+                        <button class="btn-danger" id="deleteAccount">Delete Account</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Earnings Section -->
+            <section id="earningsSection" class="content-section">
+                <h2>Earnings</h2>
+                <div class="earnings-summary">
+                    <div class="earning-card">
+                        <h3 id="todayEarnings">$45.50</h3>
+                        <p>Today's Earnings</p>
+                    </div>
+                    <div class="earning-card">
+                        <h3 id="weekEarnings">$320.75</h3>
+                        <p>This Week</p>
+                    </div>
+                    <div class="earning-card">
+                        <h3 id="monthEarnings">$1,250.00</h3>
+                        <p>This Month</p>
+                    </div>
+                </div>
+                <div class="earnings-chart">
+                    <canvas id="earningsChart"></canvas>
+                </div>
+                <div class="payout-history">
+                    <h3>Payout History</h3>
+                    <table class="payout-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="payoutTableBody">
+                            <!-- Payout rows will be populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Trip Acceptance Modal -->
+    <div id="tripModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeTrip">&times;</span>
+            <h2>New Trip Request</h2>
+            <div class="trip-details" id="tripDetails">
+                <!-- Trip details will be populated by JS -->
+            </div>
+            <div class="trip-actions">
+                <button class="btn-success" id="acceptTrip">Accept Trip</button>
+                <button class="btn-danger" id="declineTrip">Decline</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="driver-dashboard.js"></script>
+</body>
+</html>

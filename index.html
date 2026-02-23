@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teleka Taxi - Premium Ride Services</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="navbar-container">
+                <a href="index.html" class="navbar-logo">TELEKA</a>
+                <button class="navbar-toggle" aria-label="Toggle navigation">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </button>
+                
+                <ul class="navbar-menu">
+                    <li><a href="#home" class="navbar-item">Home</a></li>
+                    <li><a href="#about" class="navbar-item">About</a></li>
+                    <li><a href="#services" class="navbar-item">Services</a></li>
+                    <li><a href="#projects" class="navbar-item">Projects</a></li>
+                    <li><a href="#contact" class="navbar-item">Contact</a></li>
+                    <li><a href="admin.html" class="navbar-item">Admin</a></li>
+                    <li><a href="driver-dashboard.html" class="navbar-item">Driver</a></li>
+                    <button class="theme-toggle" aria-label="Toggle theme" id="theme-toggle"></button>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="home" class="hero">
+            <div class="hero-content">
+                <h1>Your Trusted Ride Partner</h1>
+                <p>Safe, Reliable & Affordable | Premium taxi services at your doorstep</p>
+                <button class="cta-button" id="bookingbtn">Book your ride</button>
+                
+                <!-- Booking Modal -->
+                <div id="bookingModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close" id="closeBooking">&times;</span>
+                        <h2>Book Your Ride</h2>
+                        <form id="bookingForm">
+                            <div class="form-group">
+                                <label for="pickup">Pickup Location</label>
+                                <input type="text" id="pickup" required placeholder="Enter pickup address">
+                            </div>
+                            <div class="form-group">
+                                <label for="dropoff">Drop-off Location</label>
+                                <input type="text" id="dropoff" required placeholder="Enter destination">
+                            </div>
+                            <div class="form-group">
+                                <label for="passengerName">Passenger Name</label>
+                                <input type="text" id="passengerName" required placeholder="Your full name">
+                            </div>
+                            <div class="form-group">
+                                <label for="passengerPhone">Phone Number</label>
+                                <input type="tel" id="passengerPhone" required placeholder="Your phone number">
+                            </div>
+                            <div class="form-group">
+                                <label for="passengerEmail">Email (Optional)</label>
+                                <input type="email" id="passengerEmail" placeholder="your@email.com">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="serviceType">Service Type</label>
+                                    <select id="serviceType" required>
+                                        <option value="standard">Standard Ride</option>
+                                        <option value="premium">Premium Ride</option>
+                                        <option value="scheduled">Scheduled Service</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="passengers">Passengers</label>
+                                    <select id="passengers" required>
+                                        <option value="1">1 Passenger</option>
+                                        <option value="2">2 Passengers</option>
+                                        <option value="3">3 Passengers</option>
+                                        <option value="4">4+ Passengers</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-primary">Request Ride</button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="ticker-wrap" aria-hidden="false">
+                    <div class="ticker" aria-hidden="false">
+                        <span>Entebbe Airport Pick up and drop off. Business rides. Adventure and more</span>
+                        <span aria-hidden="true">Entebbe Airport Pick up and drop off. Business rides. Adventure and more</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="services" class="services">
+            <div class="container">
+                <h2>Our Services</h2>
+                <p class="section-subtitle">Experience luxury and adventure with our comprehensive travel solutions</p>
+                <div class="service-container">
+                    <div class="service-item">
+                        <h3>Premium Rides</h3>
+                        <div class="service-icon">
+                            <img src="./ims/Prado with Driver_Pa.jpeg" alt="Premium Rides" class="service-image">
+                        </div>
+                        <p>Experience the epitome of comfort and style with our premium ride services. From luxury sedans to spacious vehicles, we ensure your journey is memorable.</p>
+                    </div>
+                    <div class="service-item">
+                        <h3>City Tours</h3>
+                        <div class="service-icon">
+                            <img src="./ims/city tr.jpeg" alt="City Tours" class="service-image">
+                        </div>
+                        <p>Explore your city like never before. Our experienced drivers know every corner and hidden gem. Let us guide you through the most exciting destinations.</p>
+                    </div>
+                    <div class="service-item">
+                        <h3>Scheduled Services</h3>
+                        <div class="service-icon">
+                            <img src="./ims/timed.jpg" alt="Scheduled Services" class="service-image">
+                        </div>
+                        <p>Need a regular ride? Our scheduled service ensures consistent, reliable transportation for your daily commute or regular trips. Book in advance and enjoy peace of mind.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="about">
+            <div class="container">
+                <div class="about-content">
+                    <div class="about-text">
+                        <h2>About Teleka Taxi</h2>
+                        <p>At Teleka Taxi, we believe that every ride should be exceptional. With years of experience in the taxi and ride services industry, we specialize in providing safe, comfortable, and affordable transportation combined with outstanding customer service.</p>
+                        <p>Our team of expert travel consultants works tirelessly to ensure that every detail of your trip is perfect, from the moment you book until you return home with memories that will last a lifetime.</p>
+                    </div>
+                    <div class="about-image">
+                        <div class="slideshow-container">
+                            <div class="slide fade">
+                                <img src="./ims/Prado with Driver_Pa.jpeg" alt="Teleka Taxi Service" class="about-img">
+                            </div>
+                            <div class="slide fade">
+                                <img src="./ims/Prado with Driver_Pa(1).jpeg" alt="Teleka Taxi Service" class="about-img">
+                            </div>
+                            <div class="slide fade">
+                                <img src="./ims/Toyota Wish Woman(6).jpeg" alt="Teleka Taxi Service" class="about-img">
+                            </div>
+                            <div class="slide fade">
+                                <img src="./ims/city tr.jpeg" alt="City Tour" class="about-img">
+                            </div>
+                            <div class="slide fade">
+                                <img src="./ims/tour tr1.jpg" alt="Tour Service" class="about-img">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects" class="projects">
+            <div class="container">
+                <h2>Featured Destinations</h2>
+                <p class="section-subtitle">Explore some of the amazing places we've helped our clients discover</p>
+                <div class="projects-grid">
+                    <div class="project-item">
+                        <img src="./ims/tour tr3.jpg" alt="Mountain adventure" class="project-image">
+                        <div class="project-overlay">
+                            <h3>Mountain Expeditions</h3>
+                            <p>Conquer the highest peaks with our expert guides</p>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <img src="./ims/tour tr1.jpg" alt="Beach resort" class="project-image">
+                        <div class="project-overlay">
+                            <h3>Tropical Paradise</h3>
+                            <p>Relax in luxury beach resorts around the world</p>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <img src="./ims/city tr.jpeg" alt="City exploration" class="project-image">
+                        <div class="project-overlay">
+                            <h3>Urban Adventures</h3>
+                            <p>Discover the vibrant culture of world cities</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer id="contact" class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Teleka Taxi</h3>
+                    <p>Your trusted partner for premium taxi and ride services in your city.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#services">Services</a></li>
+                        <li><a href="#projects">Projects</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact Info</h3>
+                    <p><img src="./ims/telicon.png" alt="Phone" class="contact-icon"> +1 (555) 123-4567</p>
+                    <p><img src="./ims/taxi.png" alt="Email" class="contact-icon"> info@crane-travel.com</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Teleka Taxi Services. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

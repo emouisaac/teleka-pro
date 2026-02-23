@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test LocalStorage</title>
+</head>
+<body>
+    <h1>Testing LocalStorage</h1>
+    <button onclick="testStorage()">Test Storage</button>
+    <div id="output"></div>
+    
+    <script>
+        function testStorage() {
+            // Test setting data
+            const testData = {
+                id: 'TEST001',
+                pickup: 'Test Pickup',
+                dropoff: 'Test Dropoff',
+                passengerName: 'Test User',
+                status: 'pending'
+            };
+            
+            localStorage.setItem('rideRequests', JSON.stringify([testData]));
+            
+            // Test getting data
+            const stored = JSON.parse(localStorage.getItem('rideRequests') || '[]');
+            
+            document.getElementById('output').innerHTML = 
+                '<h2>Stored Data:</h2><pre>' + JSON.stringify(stored, null, 2) + '</pre>';
+        }
+    </script>
+</body>
+</html>
