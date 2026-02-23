@@ -208,6 +208,8 @@ function loginAdmin(onSuccess) {
         if (main) main.style.pointerEvents = '';
         document.body.classList.remove('locked');
         if (typeof onSuccess === 'function') onSuccess();
+        // start notification polling now that admin is authenticated
+        try { setupNotifications(); } catch (e) { /* ignore */ }
     } else {
         showToast('Invalid admin credentials', 'warning');
     }
@@ -978,6 +980,13 @@ function setupNotifications() {
                 badge.textContent = unreadCount;
                 badge.style.display = unreadCount > 0 ? 'inline' : 'none';
             }
+                    // update messages badge (notifications of type 'message')
+                    const msgBadge = document.querySelector('.messages-btn .badge');
+                    const messagesCount = (notifications || []).filter(n => n.type === 'message' && !n.read).length;
+                    if (msgBadge) {
+                        msgBadge.textContent = messagesCount;
+                        msgBadge.style.display = messagesCount > 0 ? 'inline' : 'none';
+                    }
                     if (unreadCount > 0) loadRequestsTable();
                     loadActivities();
         } catch (err) {

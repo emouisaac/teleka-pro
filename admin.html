@@ -83,11 +83,11 @@
                 <div class="header-right">
                     <button class="notification-btn">
                         <i class="fas fa-bell"></i>
-                        <span class="badge">5</span>
+                        <span class="badge" style="display:none"></span>
                     </button>
                     <button class="messages-btn">
                         <i class="fas fa-envelope"></i>
-                        <span class="badge">3</span>
+                        <span class="badge" style="display:none"></span>
                     </button>
                     <div class="theme-toggle">
                         <button id="themeToggle" title="Toggle Dark Mode">
@@ -114,7 +114,7 @@
                         </div>
                         <div class="kpi-content">
                             <p class="kpi-label">Active Trips</p>
-                            <h3 class="kpi-value" id="activeTripCount">24</h3>
+                            <h3 class="kpi-value" id="activeTripCount">—</h3>
                             <p class="kpi-change positive"><i class="fas fa-arrow-up"></i> 12% increase</p>
                         </div>
                     </div>
@@ -125,7 +125,7 @@
                         </div>
                         <div class="kpi-content">
                             <p class="kpi-label">Total Drivers</p>
-                            <h3 class="kpi-value" id="totalDrivers">156</h3>
+                            <h3 class="kpi-value" id="totalDrivers">—</h3>
                             <p class="kpi-change positive"><i class="fas fa-arrow-up"></i> 8 new this month</p>
                         </div>
                     </div>
@@ -136,7 +136,7 @@
                         </div>
                         <div class="kpi-content">
                             <p class="kpi-label">Total Customers</p>
-                            <h3 class="kpi-value" id="totalCustomers">842</h3>
+                            <h3 class="kpi-value" id="totalCustomers">—</h3>
                             <p class="kpi-change positive"><i class="fas fa-arrow-up"></i> 45 new this month</p>
                         </div>
                     </div>
@@ -147,7 +147,7 @@
                         </div>
                         <div class="kpi-content">
                             <p class="kpi-label">Total Revenue</p>
-                            <h3 class="kpi-value" id="totalRevenue">$45.2K</h3>
+                            <h3 class="kpi-value" id="totalRevenue">—</h3>
                             <p class="kpi-change positive"><i class="fas fa-arrow-up"></i> 23% increase</p>
                         </div>
                     </div>
@@ -168,38 +168,9 @@
                 <!-- Recent Activity -->
                 <div class="recent-activity">
                     <h3>Recent Activities</h3>
-                    <div class="activity-list">
-                        <div class="activity-item">
-                            <div class="activity-icon success">
-                                <i class="fas fa-check-circle"></i>
-                            </div>
-                            <div class="activity-details">
-                                <p class="activity-title">Driver Registration Approved</p>
-                                <p class="activity-desc">John Smith's registration has been approved</p>
-                                <p class="activity-time">2 hours ago</p>
-                            </div>
+                        <div class="activity-list">
+                            <!-- Populated dynamically from server notifications -->
                         </div>
-                        <div class="activity-item">
-                            <div class="activity-icon warning">
-                                <i class="fas fa-exclamation-circle"></i>
-                            </div>
-                            <div class="activity-details">
-                                <p class="activity-title">Pending Document Review</p>
-                                <p class="activity-desc">5 driver documents awaiting approval</p>
-                                <p class="activity-time">4 hours ago</p>
-                            </div>
-                        </div>
-                        <div class="activity-item">
-                            <div class="activity-icon info">
-                                <i class="fas fa-info-circle"></i>
-                            </div>
-                            <div class="activity-details">
-                                <p class="activity-title">System Update</p>
-                                <p class="activity-desc">Database optimization completed successfully</p>
-                                <p class="activity-time">1 day ago</p>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </section>
 

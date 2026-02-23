@@ -44,31 +44,32 @@
                 <div id="bookingModal" class="modal">
                     <div class="modal-content">
                         <span class="close" id="closeBooking">&times;</span>
-                        <h2>Book Your Ride</h2>
+                        <h2>🚗 Book Your Ride</h2>
+                        <p class="muted small">Have an account? <a href="#" id="openLogin" style="color: var(--accent-color); text-decoration: none; font-weight: 600;">Log in</a> or continue as a guest.</p>
                         <form id="bookingForm">
                             <div class="form-group">
-                                <label for="pickup">Pickup Location</label>
-                                <input type="text" id="pickup" required placeholder="Enter pickup address">
+                                <label for="pickup">📍 Pickup Location</label>
+                                <input type="text" id="pickup" required placeholder="Where are you leaving from?">
                             </div>
                             <div class="form-group">
-                                <label for="dropoff">Drop-off Location</label>
-                                <input type="text" id="dropoff" required placeholder="Enter destination">
+                                <label for="dropoff">🎯 Drop-off Location</label>
+                                <input type="text" id="dropoff" required placeholder="Where are you going?">
                             </div>
                             <div class="form-group">
-                                <label for="passengerName">Passenger Name</label>
-                                <input type="text" id="passengerName" required placeholder="Your full name">
+                                <label for="passengerName">👤 Your Name</label>
+                                <input type="text" id="passengerName" required placeholder="Full name">
                             </div>
                             <div class="form-group">
-                                <label for="passengerPhone">Phone Number</label>
-                                <input type="tel" id="passengerPhone" required placeholder="Your phone number">
+                                <label for="passengerPhone">📱 Phone Number</label>
+                                <input type="tel" id="passengerPhone" required placeholder="+256 7XX XXX XXX">
                             </div>
                             <div class="form-group">
-                                <label for="passengerEmail">Email (Optional)</label>
+                                <label for="passengerEmail">📧 Email (Optional)</label>
                                 <input type="email" id="passengerEmail" placeholder="your@email.com">
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label for="serviceType">Service Type</label>
+                                    <label for="serviceType">🎩 Service Type</label>
                                     <select id="serviceType" required>
                                         <option value="standard">Standard Ride</option>
                                         <option value="premium">Premium Ride</option>
@@ -76,7 +77,7 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="passengers">Passengers</label>
+                                    <label for="passengers">👥 Passengers</label>
                                     <select id="passengers" required>
                                         <option value="1">1 Passenger</option>
                                         <option value="2">2 Passengers</option>
@@ -87,6 +88,50 @@
                             </div>
                             <button type="submit" class="btn-primary">Request Ride</button>
                         </form>
+                    </div>
+                </div>
+                
+                <!-- Login / Register Modal -->
+                <div id="authModal" class="modal">
+                    <div class="modal-content auth">
+                        <span class="close" id="closeAuth">&times;</span>
+                        <div class="auth-container">
+                            <div class="auth-panel auth-login" id="loginPanel">
+                                <h3>👤 Welcome Back</h3>
+                                <p class="muted">Sign in to access your bookings and receive live updates.</p>
+                                <form id="loginForm">
+                                    <div class="form-group">
+                                        <label for="loginEmail">📧 Email Address</label>
+                                        <input type="email" id="loginEmail" required placeholder="your@email.com">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="loginPhone">📱 Phone Number</label>
+                                        <input type="tel" id="loginPhone" required placeholder="+256 7XX XXX XXX">
+                                    </div>
+                                    <button type="submit" class="btn-primary">Sign In</button>
+                                </form>
+                                <p style="text-align: center; margin-top: 12px; font-size: 0.85rem; color: var(--text-color); opacity: 0.7;">Don't have an account? <a href="#" id="showRegister" style="color: var(--accent-color); text-decoration: none; font-weight: 600;">Register</a></p>
+                            </div>
+                            <div class="auth-panel auth-register" id="registerPanel" style="display: none;">
+                                <h3>✨ Get Started</h3>
+                                <form id="registerForm">
+                                    <div class="form-group">
+                                        <label for="regName">👤 Full Name</label>
+                                        <input type="text" id="regName" required placeholder="John Doe">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="regEmail">📧 Email Address</label>
+                                        <input type="email" id="regEmail" required placeholder="your@email.com">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="regPhone">📱 Phone Number</label>
+                                        <input type="tel" id="regPhone" required placeholder="+256 7XX XXX XXX">
+                                    </div>
+                                    <button type="submit" class="btn-secondary">Create Account</button>
+                                </form>
+                                <p style="text-align: center; margin-top: 12px; font-size: 0.85rem; color: var(--text-color); opacity: 0.7;">Already have an account? <a href="#" id="showLogin" style="color: var(--accent-color); text-decoration: none; font-weight: 600;">Sign in</a></p>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
