@@ -119,53 +119,107 @@ document.addEventListener('click', (e) => {
 });
 
 // =====================
-// MOCK DATA
+// PRODUCTION: No demo/mock data
+// All data is loaded from backend APIs. The front-end is production-only.
+// Admin credentials (client gate): user=Admin256, password=Ap.23082017
+// NOTE: server-side authentication should be implemented for real production systems.
 // =====================
 
-const mockTrips = [
-    { id: 'T001', driver: 'John Smith', customer: 'Alice Brown', route: 'Downtown → Airport', distance: '15.2 km', status: 'active', amount: '$28.50', time: '2:30 PM' },
-    { id: 'T002', driver: 'Mike Johnson', customer: 'Bob Wilson', route: 'Mall → Hotel', distance: '8.5 km', status: 'completed', amount: '$15.75', time: '1:45 PM' },
-    { id: 'T003', driver: 'Sarah Davis', customer: 'Carol White', route: 'Station → Office', distance: '12.0 km', status: 'active', amount: '$22.50', time: '2:15 PM' },
-    { id: 'T004', driver: 'Tom Brown', customer: 'David Green', route: 'Home → University', distance: '5.8 km', status: 'completed', amount: '$12.25', time: '11:30 AM' },
-    { id: 'T005', driver: 'Emma Wilson', customer: 'Emma Garcia', route: 'Office → Restaurant', distance: '3.2 km', status: 'active', amount: '$8.50', time: '12:45 PM' },
-];
+const ADMIN_CREDENTIALS = { user: 'Admin256', pass: 'Ap.23082017' };
 
-const mockDrivers = [
-    { id: 'D001', name: 'John Smith', email: 'john@transport.com', license: 'DL123456', status: 'active', trips: 256, rating: 4.8 },
-    { id: 'D002', name: 'Mike Johnson', email: 'mike@transport.com', license: 'DL789012', status: 'active', trips: 189, rating: 4.6 },
-    { id: 'D003', name: 'Sarah Davis', email: 'sarah@transport.com', license: 'DL345678', status: 'inactive', trips: 145, rating: 4.7 },
-    { id: 'D004', name: 'Tom Brown', email: 'tom@transport.com', license: 'DL901234', status: 'active', trips: 312, rating: 4.9 },
-    { id: 'D005', name: 'Emma Wilson', email: 'emma@transport.com', license: 'DL567890', status: 'active', trips: 198, rating: 4.5 },
-];
+// Authentication helpers
+function isAuthenticated() {
+    return sessionStorage.getItem('adminAuthenticated') === 'true';
+}
 
-const mockCustomers = [
-    { id: 'C001', name: 'Alice Brown', email: 'alice@email.com', phone: '+1-555-0101', status: 'active', trips: 45, spent: '$892.50' },
-    { id: 'C002', name: 'Bob Wilson', email: 'bob@email.com', phone: '+1-555-0102', status: 'active', trips: 32, spent: '$645.75' },
-    { id: 'C003', name: 'Carol White', email: 'carol@email.com', phone: '+1-555-0103', status: 'inactive', trips: 18, spent: '$325.00' },
-    { id: 'C004', name: 'David Green', email: 'david@email.com', phone: '+1-555-0104', status: 'active', trips: 56, spent: '$1,120.25' },
-    { id: 'C005', name: 'Emma Garcia', email: 'emma@email.com', phone: '+1-555-0105', status: 'active', trips: 28, spent: '$512.50' },
-];
-
-const mockRegistrations = [
-    { id: 'REG001', name: 'James Miller', email: 'james@email.com', status: 'pending', docs: ['License', 'Insurance', 'ID Proof'], avatar: 'https://via.placeholder.com/60' },
-    { id: 'REG002', name: 'Laura Martinez', email: 'laura@email.com', status: 'pending', docs: ['License', 'Insurance', 'Background Check'], avatar: 'https://via.placeholder.com/60' },
-    { id: 'REG003', name: 'Chris Thompson', email: 'chris@email.com', status: 'approved', docs: ['License', 'Insurance', 'ID Proof'], avatar: 'https://via.placeholder.com/60' },
-];
+function requireAuth() {
+    if (!isAuthenticated()) {
+        showToast('Admin authentication required', 'warning');
+        const loginModal = document.getElementById('adminLoginModal');
+        if (loginModal) loginModal.classList.add('show');
+        // hide main UI to prevent interaction
+        const sidebar = document.querySelector('.sidebar');
+        const main = document.querySelector('.main-content');
+        if (sidebar) sidebar.style.pointerEvents = 'none';
+        if (main) main.style.pointerEvents = 'none';
+        document.body.classList.add('locked');
+        return false;
+    }
+    // ensure UI interactive when authenticated
+    const sidebar = document.querySelector('.sidebar');
+    const main = document.querySelector('.main-content');
+    if (sidebar) sidebar.style.pointerEvents = '';
+    if (main) main.style.pointerEvents = '';
+    document.body.classList.remove('locked');
+    return true;
+}
 
 // =====================
 // DASHBOARD INITIALIZATION
 // =====================
 
 function initializeDashboard() {
-    loadTripsTable();
-    loadDriversTable();
-    loadCustomersTable();
-    loadDriverRegistrations();
-    loadRequestsTable();
     setupEventListeners();
-    initializeCharts();
     setDefaultDate();
+    initializeCharts();
     setupNotifications();
+
+    // Require admin authentication before loading production data
+    const authenticated = sessionStorage.getItem('adminAuthenticated') === 'true';
+    const loginModal = document.getElementById('adminLoginModal');
+
+    function postAuthInit() {
+        loadTripsTable();
+        loadDriversTable();
+        loadCustomersTable();
+        loadDriverRegistrations();
+        loadRequestsTable();
+        loadKPIs();
+        loadActivities();
+    }
+
+    // Attach login button
+    const loginBtn = document.getElementById('adminLoginBtn');
+    if (loginBtn) {
+        loginBtn.addEventListener('click', () => loginAdmin(postAuthInit));
+    }
+
+    if (authenticated) {
+        if (loginModal) loginModal.classList.remove('show');
+        postAuthInit();
+    } else {
+        // show login modal (already present in DOM with class show)
+        if (loginModal) loginModal.classList.add('show');
+    }
+}
+
+function loginAdmin(onSuccess) {
+    const user = document.getElementById('adminUser')?.value || '';
+    const pass = document.getElementById('adminPass')?.value || '';
+    if (user === ADMIN_CREDENTIALS.user && pass === ADMIN_CREDENTIALS.pass) {
+        sessionStorage.setItem('adminAuthenticated', 'true');
+        const loginModal = document.getElementById('adminLoginModal');
+        if (loginModal) loginModal.classList.remove('show');
+        showToast('Login successful');
+        // restore UI interactivity
+        const sidebar = document.querySelector('.sidebar');
+        const main = document.querySelector('.main-content');
+        if (sidebar) sidebar.style.pointerEvents = '';
+        if (main) main.style.pointerEvents = '';
+        document.body.classList.remove('locked');
+        if (typeof onSuccess === 'function') onSuccess();
+    } else {
+        showToast('Invalid admin credentials', 'warning');
+    }
+}
+
+function logoutAdmin() {
+    sessionStorage.removeItem('adminAuthenticated');
+    // show login modal again
+    const loginModal = document.getElementById('adminLoginModal');
+    if (loginModal) loginModal.classList.add('show');
+    document.body.classList.add('locked');
+    showToast('Logged out');
 }
 
 function setDefaultDate() {
@@ -179,38 +233,47 @@ function setDefaultDate() {
 // =====================
 // TRIPS MANAGEMENT
 // =====================
-
-function loadTripsTable() {
+async function loadTripsTable() {
+    if (!requireAuth()) return;
     const tbody = document.getElementById('tripsTableBody');
     if (!tbody) return;
-    
-    const trips = JSON.parse(localStorage.getItem('activeTrips') || '[]');
     const filter = document.getElementById('tripStatusFilter')?.value || '';
-    
-    const filteredTrips = filter ? trips.filter(t => t.status === filter) : trips;
-    
-    tbody.innerHTML = filteredTrips.map(trip => `
-        <tr>
-            <td>${trip.id}</td>
-            <td>${trip.driver}</td>
-            <td>${trip.customer}</td>
-            <td>${trip.route}</td>
-            <td>${trip.distance || 'N/A'}</td>
-            <td><span class="status-badge status-${trip.status}">${trip.status}</span></td>
-            <td>${trip.amount}</td>
-            <td>${trip.time}</td>
-            <td>
-                <button class="btn-secondary" onclick="viewTripDetails('${trip.id}')" style="font-size: 12px; padding: 5px 10px;">
-                    <i class="fas fa-eye"></i>
-                </button>
-            </td>
-        </tr>
-    `).join('') || '<tr><td colspan="9" style="text-align: center; padding: 20px;">No active trips</td></tr>';
+    try {
+        const res = await fetch('/api/trips/active');
+        if (!res.ok) throw new Error('Failed to load trips');
+        const trips = await res.json();
+        const filtered = filter ? trips.filter(t => t.status === filter) : trips;
+        tbody.innerHTML = filtered.map(trip => `
+            <tr>
+                <td>${trip.id}</td>
+                <td>${trip.driver}</td>
+                <td>${trip.customer}</td>
+                <td>${trip.route}</td>
+                <td>${trip.distance || 'N/A'}</td>
+                <td><span class="status-badge status-${trip.status}">${trip.status}</span></td>
+                <td>${trip.amount}</td>
+                <td>${trip.time}</td>
+                <td>
+                    <button class="btn-secondary" onclick="viewTripDetails('${trip.id}')" style="font-size: 12px; padding: 5px 10px;">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </td>
+            </tr>
+        `).join('') || '<tr><td colspan="9" style="text-align: center; padding: 20px;">No active trips</td></tr>';
+    } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px;">Failed to load trips</td></tr>';
+        console.error(err);
+    }
 }
 
-function viewTripDetails(tripId) {
-    const trip = mockTrips.find(t => t.id === tripId);
-    if (trip) {
+async function viewTripDetails(tripId) {
+    if (!requireAuth()) return;
+    try {
+        const res = await fetch('/api/trips/active');
+        if (!res.ok) throw new Error('Failed to load trips');
+        const trips = await res.json();
+        const trip = trips.find(t => t.id === tripId);
+        if (!trip) return showToast('Trip not found', 'warning');
         const detailsHtml = `
             <div style="padding: 20px 0;">
                 <div style="margin-bottom: 15px;">
@@ -218,7 +281,7 @@ function viewTripDetails(tripId) {
                     <p><strong>Driver:</strong> ${trip.driver}</p>
                     <p><strong>Customer:</strong> ${trip.customer}</p>
                     <p><strong>Route:</strong> ${trip.route}</p>
-                    <p><strong>Distance:</strong> ${trip.distance}</p>
+                    <p><strong>Distance:</strong> ${trip.distance || 'N/A'}</p>
                     <p><strong>Status:</strong> <span class="status-badge status-${trip.status}">${trip.status}</span></p>
                     <p><strong>Amount:</strong> ${trip.amount}</p>
                 </div>
@@ -226,6 +289,9 @@ function viewTripDetails(tripId) {
         `;
         document.getElementById('tripDetails').innerHTML = detailsHtml;
         showModal('tripModal');
+    } catch (err) {
+        console.error(err);
+        showToast('Unable to load trip details', 'warning');
     }
 }
 
@@ -233,70 +299,98 @@ function closeTripModal() {
     closeModal('tripModal');
 }
 
-function exportTripsData() {
-    const csv = 'Trip ID,Driver,Customer,Route,Distance,Status,Amount,Time\n' +
-        mockTrips.map(t => `${t.id},${t.driver},${t.customer},${t.route},${t.distance},${t.status},${t.amount},${t.time}`).join('\n');
-    
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'trips_report.csv';
-    a.click();
-    showToast('Trips data exported successfully!');
+async function exportTripsData() {
+    if (!requireAuth()) return;
+    try {
+        const res = await fetch('/api/trips/active');
+        if (!res.ok) throw new Error('Failed to load trips');
+        const trips = await res.json();
+        const csv = 'Trip ID,Driver,Customer,Route,Distance,Status,Amount,Time\n' +
+            trips.map(t => `${t.id},${t.driver},${t.customer},${t.route},${t.distance || ''},${t.status},${t.amount},${t.time}`).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'trips_report.csv';
+        a.click();
+        showToast('Trips data exported successfully!');
+    } catch (err) {
+        console.error(err);
+        showToast('Failed to export trips', 'warning');
+    }
 }
 
 // =====================
 // DRIVER REGISTRATION
 // =====================
 
-function loadDriverRegistrations() {
+async function loadDriverRegistrations(statusFilter = '') {
+    if (!requireAuth()) return;
     const grid = document.getElementById('driverRegistrationGrid');
     if (!grid) return;
-    
-    grid.innerHTML = mockRegistrations.map(reg => `
-        <div class="registration-card">
-            <div class="registration-header">
-                <img src="${reg.avatar}" alt="${reg.name}" class="registration-avatar">
-                <div class="registration-info">
-                    <h4>${reg.name}</h4>
-                    <p>${reg.email}</p>
-                    <span class="status-badge status-${reg.status}" style="font-size: 11px;">${reg.status}</span>
+    try {
+        const res = await fetch('/api/drivers');
+        if (!res.ok) throw new Error('Failed to load drivers');
+        const drivers = await res.json();
+        // treat drivers with status 'pending' as registration requests
+        const regs = drivers.filter(d => (d.status || '').toLowerCase() === 'pending');
+        const filtered = statusFilter ? regs.filter(r => r.status === statusFilter) : regs;
+        if (filtered.length === 0) return grid.innerHTML = '<p style="color: var(--text-light); text-align: center; padding: 20px;">No registration requests</p>';
+        grid.innerHTML = filtered.map(reg => `
+            <div class="registration-card">
+                <div class="registration-header">
+                    <img src="${reg.avatar || 'https://via.placeholder.com/60'}" alt="${reg.name}" class="registration-avatar">
+                    <div class="registration-info">
+                        <h4>${reg.name}</h4>
+                        <p>${reg.email}</p>
+                        <span class="status-badge status-${reg.status || 'pending'}" style="font-size: 11px;">${reg.status || 'pending'}</span>
+                    </div>
+                </div>
+                <div class="registration-documents">
+                    <p>Documents</p>
+                    <ul class="doc-list">
+                        ${(reg.docs || []).map(doc => `<li>${doc}</li>`).join('')}
+                    </ul>
+                </div>
+                <div class="registration-actions">
+                    <button class="btn-primary" onclick="approveRegistration('${reg.id}')">
+                        <i class="fas fa-check"></i> Approve
+                    </button>
+                    <button class="btn-danger" onclick="rejectRegistration('${reg.id}')">
+                        <i class="fas fa-times"></i> Reject
+                    </button>
                 </div>
             </div>
-            <div class="registration-documents">
-                <p>Documents</p>
-                <ul class="doc-list">
-                    ${reg.docs.map(doc => `<li>${doc}</li>`).join('')}
-                </ul>
-            </div>
-            <div class="registration-actions">
-                <button class="btn-primary" onclick="approveRegistration('${reg.id}')" ${reg.status === 'approved' ? 'disabled' : ''}>
-                    <i class="fas fa-check"></i> Approve
-                </button>
-                <button class="btn-danger" onclick="rejectRegistration('${reg.id}')" ${reg.status === 'rejected' ? 'disabled' : ''}>
-                    <i class="fas fa-times"></i> Reject
-                </button>
-            </div>
-        </div>
-    `).join('');
-}
-
-function approveRegistration(regId) {
-    const reg = mockRegistrations.find(r => r.id === regId);
-    if (reg) {
-        reg.status = 'approved';
-        loadDriverRegistrations();
-        showToast(`Registration approved for ${reg.name}`);
+        `).join('');
+    } catch (err) {
+        console.error(err);
+        grid.innerHTML = '<p style="color: var(--text-light); text-align: center; padding: 20px;">Failed to load registration requests</p>';
     }
 }
 
-function rejectRegistration(regId) {
-    const reg = mockRegistrations.find(r => r.id === regId);
-    if (reg) {
-        reg.status = 'rejected';
+async function approveRegistration(regId) {
+    if (!requireAuth()) return;
+    try {
+        const res = await fetch(`/api/drivers/${regId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'approved' }) });
+        if (!res.ok) throw new Error('Failed to approve');
+        showToast('Registration approved');
         loadDriverRegistrations();
-        showToast(`Registration rejected for ${reg.name}`, 'warning');
+    } catch (err) {
+        console.error(err);
+        showToast('Failed to approve registration', 'warning');
+    }
+}
+
+async function rejectRegistration(regId) {
+    if (!requireAuth()) return;
+    try {
+        const res = await fetch(`/api/drivers/${regId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'rejected' }) });
+        if (!res.ok) throw new Error('Failed to reject');
+        showToast('Registration rejected', 'warning');
+        loadDriverRegistrations();
+    } catch (err) {
+        console.error(err);
+        showToast('Failed to reject registration', 'warning');
     }
 }
 
@@ -304,51 +398,66 @@ function rejectRegistration(regId) {
 // DRIVERS MANAGEMENT
 // =====================
 
-function loadDriversTable() {
+async function loadDriversTable(searchTerm = '') {
+    if (!requireAuth()) return;
     const tbody = document.getElementById('driversTableBody');
     if (!tbody) return;
-    
-    tbody.innerHTML = mockDrivers.map(driver => `
-        <tr>
-            <td>${driver.id}</td>
-            <td>${driver.name}</td>
-            <td>${driver.email}</td>
-            <td>${driver.license}</td>
-            <td><span class="status-badge status-${driver.status}">${driver.status}</span></td>
-            <td>${driver.trips}</td>
-            <td>
-                <i class="fas fa-star" style="color: #ffc107;"></i> ${driver.rating}
-            </td>
-            <td>
-                <button class="btn-secondary" onclick="viewDriverDetails('${driver.id}')" style="font-size: 12px; padding: 5px 10px;">
-                    <i class="fas fa-eye"></i>
-                </button>
-                <button class="btn-secondary" onclick="editDriver('${driver.id}')" style="font-size: 12px; padding: 5px 10px;">
-                    <i class="fas fa-edit"></i>
-                </button>
-            </td>
-        </tr>
-    `).join('');
+    try {
+        const res = await fetch('/api/drivers');
+        if (!res.ok) throw new Error('Failed to load drivers');
+        const drivers = await res.json();
+        const filtered = searchTerm ? drivers.filter(d => (d.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || (d.email || '').toLowerCase().includes(searchTerm.toLowerCase())) : drivers;
+        if (filtered.length === 0) return tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px;">No drivers found</td></tr>';
+        tbody.innerHTML = filtered.map(driver => `
+            <tr>
+                <td>${driver.id}</td>
+                <td>${driver.name}</td>
+                <td>${driver.email || ''}</td>
+                <td>${driver.license || ''}</td>
+                <td><span class="status-badge status-${driver.status || 'unknown'}">${driver.status || 'unknown'}</span></td>
+                <td>${driver.trips || 0}</td>
+                <td>
+                    <i class="fas fa-star" style="color: #ffc107;"></i> ${driver.rating || 'N/A'}
+                </td>
+                <td>
+                    <button class="btn-secondary" onclick="viewDriverDetails('${driver.id}')" style="font-size: 12px; padding: 5px 10px;">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    } catch (err) {
+        console.error(err);
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px;">Failed to load drivers</td></tr>';
+    }
 }
 
-function viewDriverDetails(driverId) {
-    const driver = mockDrivers.find(d => d.id === driverId);
-    if (driver) {
+async function viewDriverDetails(driverId) {
+    if (!requireAuth()) return;
+    try {
+        const res = await fetch('/api/drivers');
+        if (!res.ok) throw new Error('Failed to load drivers');
+        const drivers = await res.json();
+        const driver = drivers.find(d => d.id === driverId);
+        if (!driver) return showToast('Driver not found', 'warning');
         const detailsHtml = `
             <div style="padding: 20px 0;">
                 <div style="margin-bottom: 15px;">
                     <p><strong>Driver ID:</strong> ${driver.id}</p>
                     <p><strong>Name:</strong> ${driver.name}</p>
-                    <p><strong>Email:</strong> ${driver.email}</p>
-                    <p><strong>License:</strong> ${driver.license}</p>
-                    <p><strong>Status:</strong> <span class="status-badge status-${driver.status}">${driver.status}</span></p>
-                    <p><strong>Trips Completed:</strong> ${driver.trips}</p>
-                    <p><strong>Rating:</strong> <i class="fas fa-star" style="color: #ffc107;"></i> ${driver.rating}</p>
+                    <p><strong>Email:</strong> ${driver.email || ''}</p>
+                    <p><strong>License:</strong> ${driver.license || ''}</p>
+                    <p><strong>Status:</strong> <span class="status-badge status-${driver.status || 'unknown'}">${driver.status || 'unknown'}</span></p>
+                    <p><strong>Trips Completed:</strong> ${driver.trips || 0}</p>
+                    <p><strong>Rating:</strong> <i class="fas fa-star" style="color: #ffc107;"></i> ${driver.rating || 'N/A'}</p>
                 </div>
             </div>
         `;
         document.getElementById('driverDetails').innerHTML = detailsHtml;
         showModal('driverModal');
+    } catch (err) {
+        console.error(err);
+        showToast('Unable to load driver details', 'warning');
     }
 }
 
@@ -373,35 +482,67 @@ function openAddDriverModal() {
 // CUSTOMERS MANAGEMENT
 // =====================
 
-function loadCustomersTable() {
+async function loadCustomersTable(searchTerm = '') {
+    if (!requireAuth()) return;
     const tbody = document.getElementById('customersTableBody');
     if (!tbody) return;
-    
-    tbody.innerHTML = mockCustomers.map(customer => `
-        <tr>
-            <td>${customer.id}</td>
-            <td>${customer.name}</td>
-            <td>${customer.email}</td>
-            <td>${customer.phone}</td>
-            <td><span class="status-badge status-${customer.status}">${customer.status}</span></td>
-            <td>${customer.trips}</td>
-            <td>${customer.spent}</td>
-            <td>
-                <button class="btn-secondary" onclick="viewCustomerDetails('${customer.id}')" style="font-size: 12px; padding: 5px 10px;">
-                    <i class="fas fa-eye"></i>
-                </button>
-                <button class="btn-secondary" onclick="editCustomer('${customer.id}')" style="font-size: 12px; padding: 5px 10px;">
-                    <i class="fas fa-edit"></i>
-                </button>
-            </td>
-        </tr>
-    `).join('');
+    try {
+        const res = await fetch('/api/requests');
+        if (!res.ok) throw new Error('Failed to load requests');
+        const requests = await res.json();
+        // derive customers from requests
+        const customersMap = {};
+        requests.forEach(r => {
+            const id = r.passengerEmail || r.passengerPhone || r.passengerName || r.id;
+            if (!customersMap[id]) {
+                customersMap[id] = { id: id, name: r.passengerName || 'Unknown', email: r.passengerEmail || '', phone: r.passengerPhone || '', trips: 0, spent: 0 };
+            }
+            customersMap[id].trips += 1;
+            customersMap[id].spent += Number(r.fare || 0);
+        });
+        let customers = Object.values(customersMap);
+        if (searchTerm) {
+            customers = customers.filter(c => (c.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || (c.email || '').toLowerCase().includes(searchTerm.toLowerCase()));
+        }
+        if (customers.length === 0) return tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px;">No customers found</td></tr>';
+        tbody.innerHTML = customers.map((customer, idx) => `
+            <tr>
+                <td>${customer.id || 'C' + (idx+1)}</td>
+                <td>${customer.name}</td>
+                <td>${customer.email}</td>
+                <td>${customer.phone}</td>
+                <td><span class="status-badge status-active">active</span></td>
+                <td>${customer.trips}</td>
+                <td>$${(customer.spent || 0).toFixed(2)}</td>
+                <td>
+                    <button class="btn-secondary" onclick="viewCustomerDetails('${customer.id}')" style="font-size: 12px; padding: 5px 10px;">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    } catch (err) {
+        console.error(err);
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px;">Failed to load customers</td></tr>';
+    }
 }
 
-function viewCustomerDetails(customerId) {
-    const customer = mockCustomers.find(c => c.id === customerId);
-    if (customer) {
-        showToast(`Viewing details for ${customer.name}`);
+async function viewCustomerDetails(customerId) {
+    try {
+        const res = await fetch('/api/requests');
+        if (!res.ok) throw new Error('Failed to load requests');
+        const requests = await res.json();
+        const found = requests.find(r => (r.passengerEmail || r.passengerPhone || r.passengerName || r.id) === customerId || r.passengerName === customerId);
+        if (found) {
+            const name = found.passengerName || 'Unknown';
+            const details = `Viewing details for ${name} — Phone: ${found.passengerPhone || 'N/A'}, Email: ${found.passengerEmail || 'N/A'}`;
+            showToast(details);
+        } else {
+            showToast('Customer details not found', 'warning');
+        }
+    } catch (err) {
+        console.error(err);
+        showToast('Failed to load customer details', 'warning');
     }
 }
 
@@ -426,43 +567,63 @@ function toggleResetPanel(type) {
 }
 
 function searchDriversForReset() {
-    const searchTerm = document.getElementById('driverResetSearch').value;
-    const results = mockDrivers.filter(d => 
-        d.email.includes(searchTerm) || d.id.includes(searchTerm) || d.name.includes(searchTerm)
-    );
-    
+    if (!requireAuth()) return;
+    const searchTerm = document.getElementById('driverResetSearch').value || '';
     const resultsDiv = document.getElementById('driverResetResults');
-    resultsDiv.innerHTML = results.map(driver => `
-        <div class="result-item">
-            <div class="result-info">
-                <h5>${driver.name}</h5>
-                <p>${driver.email}</p>
-            </div>
-            <button class="btn-primary" onclick="sendResetLink('driver', '${driver.id}', '${driver.email}')" style="font-size: 12px; padding: 8px 15px;">
-                <i class="fas fa-key"></i> Reset
-            </button>
-        </div>
-    `).join('') || '<p style="color: var(--text-light); text-align: center; padding: 20px;">No drivers found</p>';
+    resultsDiv.innerHTML = '<p style="color: var(--text-light); text-align: center; padding: 20px;">Searching...</p>';
+    fetch('/api/drivers')
+        .then(r => r.ok ? r.json() : Promise.reject('Failed'))
+        .then(drivers => {
+            const filtered = drivers.filter(d => (d.email || '').includes(searchTerm) || (d.id || '').includes(searchTerm) || (d.name || '').includes(searchTerm));
+            if (filtered.length === 0) return resultsDiv.innerHTML = '<p style="color: var(--text-light); text-align: center; padding: 20px;">No drivers found</p>';
+            resultsDiv.innerHTML = filtered.map(driver => `
+                <div class="result-item">
+                    <div class="result-info">
+                        <h5>${driver.name}</h5>
+                        <p>${driver.email || ''}</p>
+                    </div>
+                    <button class="btn-primary" onclick="sendResetLink('driver', '${driver.id}', '${driver.email || ''}')" style="font-size: 12px; padding: 8px 15px;">
+                        <i class="fas fa-key"></i> Reset
+                    </button>
+                </div>
+            `).join('');
+        }).catch(err => {
+            console.error(err);
+            resultsDiv.innerHTML = '<p style="color: var(--text-light); text-align: center; padding: 20px;">Failed to search drivers</p>';
+        });
 }
 
 function searchCustomersForReset() {
-    const searchTerm = document.getElementById('customerResetSearch').value;
-    const results = mockCustomers.filter(c => 
-        c.email.includes(searchTerm) || c.id.includes(searchTerm) || c.name.includes(searchTerm)
-    );
-    
+    if (!requireAuth()) return;
+    const searchTerm = document.getElementById('customerResetSearch').value || '';
     const resultsDiv = document.getElementById('customerResetResults');
-    resultsDiv.innerHTML = results.map(customer => `
-        <div class="result-item">
-            <div class="result-info">
-                <h5>${customer.name}</h5>
-                <p>${customer.email}</p>
-            </div>
-            <button class="btn-primary" onclick="sendResetLink('customer', '${customer.id}', '${customer.email}')" style="font-size: 12px; padding: 8px 15px;">
-                <i class="fas fa-key"></i> Reset
-            </button>
-        </div>
-    `).join('') || '<p style="color: var(--text-light); text-align: center; padding: 20px;">No customers found</p>';
+    resultsDiv.innerHTML = '<p style="color: var(--text-light); text-align: center; padding: 20px;">Searching...</p>';
+    // derive customers from requests
+    fetch('/api/requests')
+        .then(r => r.ok ? r.json() : Promise.reject('Failed'))
+        .then(requests => {
+            const map = {};
+            requests.forEach(r => {
+                const id = r.passengerEmail || r.passengerPhone || r.passengerName || r.id;
+                if (!map[id]) map[id] = { id, name: r.passengerName || 'Unknown', email: r.passengerEmail || '' };
+            });
+            const customers = Object.values(map).filter(c => (c.email || '').includes(searchTerm) || (c.id || '').includes(searchTerm) || (c.name || '').includes(searchTerm));
+            if (customers.length === 0) return resultsDiv.innerHTML = '<p style="color: var(--text-light); text-align: center; padding: 20px;">No customers found</p>';
+            resultsDiv.innerHTML = customers.map(customer => `
+                <div class="result-item">
+                    <div class="result-info">
+                        <h5>${customer.name}</h5>
+                        <p>${customer.email}</p>
+                    </div>
+                    <button class="btn-primary" onclick="sendResetLink('customer', '${customer.id}', '${customer.email}')" style="font-size: 12px; padding: 8px 15px;">
+                        <i class="fas fa-key"></i> Reset
+                    </button>
+                </div>
+            `).join('');
+        }).catch(err => {
+            console.error(err);
+            resultsDiv.innerHTML = '<p style="color: var(--text-light); text-align: center; padding: 20px;">Failed to search customers</p>';
+        });
 }
 
 function sendResetLink(type, id, email) {
@@ -523,8 +684,8 @@ function setupEventListeners() {
             if (confirm('Are you sure you want to logout?')) {
                 showToast('Logging out...');
                 setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1000);
+                    logoutAdmin();
+                }, 600);
             }
         });
     }
@@ -532,31 +693,8 @@ function setupEventListeners() {
     // Trip status filter
     const tripStatusFilter = document.getElementById('tripStatusFilter');
     if (tripStatusFilter) {
-        tripStatusFilter.addEventListener('change', (e) => {
-            const status = e.target.value;
-            const tbody = document.getElementById('tripsTableBody');
-            if (status) {
-                const filtered = mockTrips.filter(t => t.status === status);
-                tbody.innerHTML = filtered.map(trip => `
-                    <tr>
-                        <td>${trip.id}</td>
-                        <td>${trip.driver}</td>
-                        <td>${trip.customer}</td>
-                        <td>${trip.route}</td>
-                        <td>${trip.distance}</td>
-                        <td><span class="status-badge status-${trip.status}">${trip.status}</span></td>
-                        <td>${trip.amount}</td>
-                        <td>${trip.time}</td>
-                        <td>
-                            <button class="btn-secondary" onclick="viewTripDetails('${trip.id}')" style="font-size: 12px; padding: 5px 10px;">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `).join('');
-            } else {
-                loadTripsTable();
-            }
+        tripStatusFilter.addEventListener('change', () => {
+            loadTripsTable();
         });
     }
     
@@ -564,34 +702,8 @@ function setupEventListeners() {
     const driverSearch = document.getElementById('driverSearch');
     if (driverSearch) {
         driverSearch.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            const tbody = document.getElementById('driversTableBody');
-            if (searchTerm) {
-                const filtered = mockDrivers.filter(d => 
-                    d.name.toLowerCase().includes(searchTerm) || 
-                    d.email.toLowerCase().includes(searchTerm)
-                );
-                tbody.innerHTML = filtered.map(driver => `
-                    <tr>
-                        <td>${driver.id}</td>
-                        <td>${driver.name}</td>
-                        <td>${driver.email}</td>
-                        <td>${driver.license}</td>
-                        <td><span class="status-badge status-${driver.status}">${driver.status}</span></td>
-                        <td>${driver.trips}</td>
-                        <td>
-                            <i class="fas fa-star" style="color: #ffc107;"></i> ${driver.rating}
-                        </td>
-                        <td>
-                            <button class="btn-secondary" onclick="viewDriverDetails('${driver.id}')" style="font-size: 12px; padding: 5px 10px;">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `).join('');
-            } else {
-                loadDriversTable();
-            }
+            const searchTerm = e.target.value || '';
+            loadDriversTable(searchTerm);
         });
     }
     
@@ -599,32 +711,8 @@ function setupEventListeners() {
     const customerSearch = document.getElementById('customerSearch');
     if (customerSearch) {
         customerSearch.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            const tbody = document.getElementById('customersTableBody');
-            if (searchTerm) {
-                const filtered = mockCustomers.filter(c => 
-                    c.name.toLowerCase().includes(searchTerm) || 
-                    c.email.toLowerCase().includes(searchTerm)
-                );
-                tbody.innerHTML = filtered.map(customer => `
-                    <tr>
-                        <td>${customer.id}</td>
-                        <td>${customer.name}</td>
-                        <td>${customer.email}</td>
-                        <td>${customer.phone}</td>
-                        <td><span class="status-badge status-${customer.status}">${customer.status}</span></td>
-                        <td>${customer.trips}</td>
-                        <td>${customer.spent}</td>
-                        <td>
-                            <button class="btn-secondary" onclick="viewCustomerDetails('${customer.id}')" style="font-size: 12px; padding: 5px 10px;">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `).join('');
-            } else {
-                loadCustomersTable();
-            }
+            const searchTerm = e.target.value || '';
+            loadCustomersTable(searchTerm);
         });
     }
     
@@ -632,39 +720,8 @@ function setupEventListeners() {
     const driverStatusFilter = document.getElementById('driverStatusFilter');
     if (driverStatusFilter) {
         driverStatusFilter.addEventListener('change', (e) => {
-            const status = e.target.value;
-            const grid = document.getElementById('driverRegistrationGrid');
-            if (status) {
-                const filtered = mockRegistrations.filter(r => r.status === status);
-                grid.innerHTML = filtered.map(reg => `
-                    <div class="registration-card">
-                        <div class="registration-header">
-                            <img src="${reg.avatar}" alt="${reg.name}" class="registration-avatar">
-                            <div class="registration-info">
-                                <h4>${reg.name}</h4>
-                                <p>${reg.email}</p>
-                                <span class="status-badge status-${reg.status}" style="font-size: 11px;">${reg.status}</span>
-                            </div>
-                        </div>
-                        <div class="registration-documents">
-                            <p>Documents</p>
-                            <ul class="doc-list">
-                                ${reg.docs.map(doc => `<li>${doc}</li>`).join('')}
-                            </ul>
-                        </div>
-                        <div class="registration-actions">
-                            <button class="btn-primary" onclick="approveRegistration('${reg.id}')" ${reg.status === 'approved' ? 'disabled' : ''}>
-                                <i class="fas fa-check"></i> Approve
-                            </button>
-                            <button class="btn-danger" onclick="rejectRegistration('${reg.id}')" ${reg.status === 'rejected' ? 'disabled' : ''}>
-                                <i class="fas fa-times"></i> Reject
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
-            } else {
-                loadDriverRegistrations();
-            }
+            const status = e.target.value || '';
+            loadDriverRegistrations(status);
         });
     }
 }
@@ -700,51 +757,119 @@ function initializeCharts() {
 }
 
 // =====================
+// DASHBOARD KPIS
+// =====================
+async function loadKPIs() {
+    try {
+        const [tripsRes, driversRes, requestsRes] = await Promise.all([
+            fetch('/api/trips/active'),
+            fetch('/api/drivers'),
+            fetch('/api/requests')
+        ]);
+        const trips = tripsRes.ok ? await tripsRes.json() : [];
+        const drivers = driversRes.ok ? await driversRes.json() : [];
+        const requests = requestsRes.ok ? await requestsRes.json() : [];
+
+        const activeTripCount = (trips || []).length;
+        const totalDrivers = (drivers || []).length;
+        const uniqueCustomers = new Set((requests || []).map(r => r.passengerEmail || r.passengerPhone || r.passengerName || r.id));
+        const totalCustomers = uniqueCustomers.size;
+        const totalRevenue = (requests || []).reduce((sum, r) => sum + (Number(r.fare) || 0), 0);
+
+        document.getElementById('activeTripCount').textContent = activeTripCount;
+        document.getElementById('totalDrivers').textContent = totalDrivers;
+        document.getElementById('totalCustomers').textContent = totalCustomers;
+        document.getElementById('totalRevenue').textContent = `$${totalRevenue.toFixed(2)}`;
+    } catch (err) {
+        console.error('Failed to load KPIs', err);
+    }
+}
+
+// =====================
+// RECENT ACTIVITIES
+// =====================
+async function loadActivities() {
+    const container = document.querySelector('.activity-list');
+    if (!container) return;
+    try {
+        const res = await fetch('/api/notifications');
+        if (!res.ok) throw new Error('Failed to load activities');
+        const notes = await res.json();
+        const latest = (notes || []).slice(-6).reverse();
+        if (latest.length === 0) return container.innerHTML = '<p style="color:var(--text-light); padding:12px; text-align:center;">No recent activity</p>';
+        container.innerHTML = latest.map(n => `
+            <div class="activity-item">
+                <div class="activity-icon ${n.type === 'new_request' ? 'success' : n.type === 'new_assignment' ? 'info' : 'info'}">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="activity-details">
+                    <p class="activity-title">${n.message}</p>
+                    <p class="activity-desc">${n.data && n.data.passengerName ? n.data.passengerName : ''}</p>
+                    <p class="activity-time">${new Date(n.timestamp).toLocaleString()}</p>
+                </div>
+            </div>
+        `).join('');
+    } catch (err) {
+        console.error(err);
+        container.innerHTML = '<p style="color:var(--text-light); padding:12px; text-align:center;">Unable to load activity</p>';
+    }
+}
+
+// =====================
 // RIDE REQUESTS MANAGEMENT
 // =====================
 
-function loadRequestsTable() {
+async function loadRequestsTable() {
+    if (!requireAuth()) return;
     const tbody = document.getElementById('requestsTableBody');
     if (!tbody) return;
-    
-    const requests = JSON.parse(localStorage.getItem('rideRequests') || '[]');
     const filter = document.getElementById('requestStatusFilter')?.value || '';
-    
-    const filteredRequests = filter ? requests.filter(r => r.status === filter) : requests;
-    
-    tbody.innerHTML = filteredRequests.map(request => `
-        <tr>
-            <td>${request.id}</td>
-            <td>${request.passengerName}</td>
-            <td>${request.pickup}</td>
-            <td>${request.dropoff}</td>
-            <td><span class="service-badge service-${request.serviceType}">${request.serviceType}</span></td>
-            <td><span class="status-badge status-${request.status}">${request.status}</span></td>
-            <td>${new Date(request.timestamp).toLocaleString()}</td>
-            <td>
-                <button class="btn-secondary" onclick="viewRequestDetails('${request.id}')" style="font-size: 12px; padding: 5px 10px;">
-                    <i class="fas fa-eye"></i>
-                </button>
-                ${request.status === 'pending' ? `
-                    <button class="btn-primary" onclick="assignDriver('${request.id}')" style="font-size: 12px; padding: 5px 10px;">
-                        <i class="fas fa-user-plus"></i> Assign
+    try {
+        const res = await fetch('/api/requests');
+        if (!res.ok) throw new Error('Failed to load requests');
+        const requests = await res.json();
+        const filtered = filter ? requests.filter(r => r.status === filter) : requests;
+        if (filtered.length === 0) return tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px;">No ride requests found</td></tr>';
+        tbody.innerHTML = filtered.map(request => `
+            <tr>
+                <td>${request.id}</td>
+                <td>${request.passengerName}</td>
+                <td>${request.pickup}</td>
+                <td>${request.dropoff}</td>
+                <td><span class="service-badge service-${request.serviceType}">${request.serviceType}</span></td>
+                <td><span class="status-badge status-${request.status}">${request.status}</span></td>
+                <td>${new Date(request.timestamp).toLocaleString()}</td>
+                <td>
+                    <button class="btn-secondary" onclick="viewRequestDetails('${request.id}')" style="font-size: 12px; padding: 5px 10px;">
+                        <i class="fas fa-eye"></i>
                     </button>
-                ` : ''}
-                ${request.status === 'assigned' ? `
-                    <button class="btn-success" onclick="markCompleted('${request.id}')" style="font-size: 12px; padding: 5px 10px;">
-                        <i class="fas fa-check"></i> Complete
-                    </button>
-                ` : ''}
-            </td>
-        </tr>
-    `).join('') || '<tr><td colspan="8" style="text-align: center; padding: 20px;">No ride requests found</td></tr>';
+                    ${request.status === 'pending' ? `
+                        <button class="btn-primary" onclick="assignDriver('${request.id}')" style="font-size: 12px; padding: 5px 10px;">
+                            <i class="fas fa-user-plus"></i> Assign
+                        </button>
+                    ` : ''}
+                    ${request.status === 'assigned' ? `
+                        <button class="btn-success" onclick="markCompleted('${request.id}')" style="font-size: 12px; padding: 5px 10px;">
+                            <i class="fas fa-check"></i> Complete
+                        </button>
+                    ` : ''}
+                </td>
+            </tr>
+        `).join('');
+    } catch (err) {
+        console.error(err);
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px;">Failed to load requests</td></tr>';
+    }
 }
 
-function viewRequestDetails(requestId) {
-    const requests = JSON.parse(localStorage.getItem('rideRequests') || '[]');
-    const request = requests.find(r => r.id === requestId);
-    
-    if (request) {
+async function viewRequestDetails(requestId) {
+    if (!requireAuth()) return;
+    try {
+        const res = await fetch('/api/requests');
+        if (!res.ok) throw new Error('Failed to load requests');
+        const requests = await res.json();
+        const request = requests.find(r => r.id === requestId);
+        if (!request) return showToast('Request not found', 'warning');
         const details = `
             <div style="padding: 20px 0;">
                 <div style="margin-bottom: 15px;">
@@ -764,93 +889,70 @@ function viewRequestDetails(requestId) {
         `;
         document.getElementById('tripDetails').innerHTML = details;
         showModal('tripModal');
+    } catch (err) {
+        console.error(err);
+        showToast('Unable to load request details', 'warning');
     }
 }
 
-function assignDriver(requestId) {
-    const drivers = JSON.parse(localStorage.getItem('drivers') || '[]');
-    if (drivers.length === 0) {
-        // Use mock drivers if no real drivers
-        const mockDrivers = [
-            { id: 'D001', name: 'John Smith' },
-            { id: 'D002', name: 'Mike Johnson' },
-            { id: 'D003', name: 'Sarah Davis' }
-        ];
-        localStorage.setItem('drivers', JSON.stringify(mockDrivers));
+async function assignDriver(requestId) {
+    if (!requireAuth()) return;
+    try {
+        const res = await fetch('/api/drivers');
+        if (!res.ok) throw new Error('Failed to load drivers');
+        const drivers = await res.json();
+        const driverOptions = drivers.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+        const modalContent = `
+            <h3>Assign Driver to Request ${requestId}</h3>
+            <div style="margin: 20px 0;">
+                <label for="driverSelect">Select Driver:</label>
+                <select id="driverSelect" style="width: 100%; padding: 10px; margin: 10px 0;">
+                    ${driverOptions}
+                </select>
+            </div>
+            <div style="text-align: right;">
+                <button class="btn-secondary" onclick="closeModal('tripModal')">Cancel</button>
+                <button class="btn-primary" onclick="confirmAssignDriver('${requestId}')">Assign Driver</button>
+            </div>
+        `;
+        document.getElementById('tripDetails').innerHTML = modalContent;
+        showModal('tripModal');
+    } catch (err) {
+        console.error(err);
+        showToast('Failed to load drivers', 'warning');
     }
-    
-    const availableDrivers = JSON.parse(localStorage.getItem('drivers') || '[]');
-    const driverOptions = availableDrivers.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
-    
-    const modalContent = `
-        <h3>Assign Driver to Request ${requestId}</h3>
-        <div style="margin: 20px 0;">
-            <label for="driverSelect">Select Driver:</label>
-            <select id="driverSelect" style="width: 100%; padding: 10px; margin: 10px 0;">
-                ${driverOptions}
-            </select>
-        </div>
-        <div style="text-align: right;">
-            <button class="btn-secondary" onclick="closeModal('tripModal')">Cancel</button>
-            <button class="btn-primary" onclick="confirmAssignDriver('${requestId}')">Assign Driver</button>
-        </div>
-    `;
-    
-    document.getElementById('tripDetails').innerHTML = modalContent;
 }
 
-function confirmAssignDriver(requestId) {
-    const driverId = document.getElementById('driverSelect').value;
-    const driverName = document.getElementById('driverSelect').options[document.getElementById('driverSelect').selectedIndex].text;
-    
-    const requests = JSON.parse(localStorage.getItem('rideRequests') || '[]');
-    const requestIndex = requests.findIndex(r => r.id === requestId);
-    
-    if (requestIndex !== -1) {
-        requests[requestIndex].status = 'assigned';
-        requests[requestIndex].assignedDriver = driverName;
-        localStorage.setItem('rideRequests', JSON.stringify(requests));
-        
-        // Add to active trips
-        const trips = JSON.parse(localStorage.getItem('activeTrips') || '[]');
-        trips.push({
-            id: requestId,
-            driver: driverName,
-            customer: requests[requestIndex].passengerName,
-            route: `${requests[requestIndex].pickup} → ${requests[requestIndex].dropoff}`,
-            status: 'assigned',
-            amount: 'Pending',
-            time: new Date().toLocaleTimeString()
-        });
-        localStorage.setItem('activeTrips', JSON.stringify(trips));
-        
+async function confirmAssignDriver(requestId) {
+    if (!requireAuth()) return;
+    const select = document.getElementById('driverSelect');
+    if (!select) return showToast('No driver selected', 'warning');
+    const driverId = select.value;
+    const driverName = select.options[select.selectedIndex].text;
+    try {
+        const res = await fetch(`/api/requests/${requestId}/assign`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ driverId, driverName }) });
+        if (!res.ok) throw new Error('Assign failed');
         showToast(`Driver ${driverName} assigned to request ${requestId}`);
-        loadRequestsTable();
         closeModal('tripModal');
-        
-        // Notify driver
-        notifyDriver(requestId, driverName);
+        loadRequestsTable();
+        loadTripsTable();
+    } catch (err) {
+        console.error(err);
+        showToast('Failed to assign driver', 'warning');
     }
 }
 
-function markCompleted(requestId) {
-    const requests = JSON.parse(localStorage.getItem('rideRequests') || '[]');
-    const requestIndex = requests.findIndex(r => r.id === requestId);
-    
-    if (requestIndex !== -1) {
-        requests[requestIndex].status = 'completed';
-        localStorage.setItem('rideRequests', JSON.stringify(requests));
-        
-        // Update active trips
-        const trips = JSON.parse(localStorage.getItem('activeTrips') || '[]');
-        const tripIndex = trips.findIndex(t => t.id === requestId);
-        if (tripIndex !== -1) {
-            trips[tripIndex].status = 'completed';
-            localStorage.setItem('activeTrips', JSON.stringify(trips));
-        }
-        
+async function markCompleted(requestId) {
+    if (!requireAuth()) return;
+    try {
+        const res = await fetch(`/api/trips/${requestId}/complete`, { method: 'POST' });
+        if (!res.ok) throw new Error('Failed to complete trip');
         showToast(`Request ${requestId} marked as completed`);
         loadRequestsTable();
+        loadTripsTable();
+    } catch (err) {
+        console.error(err);
+        showToast('Failed to complete trip', 'warning');
     }
 }
 
@@ -859,41 +961,33 @@ function refreshRequests() {
     showToast('Requests refreshed');
 }
 
-function notifyDriver(requestId, driverName) {
-    // This will be picked up by driver dashboard
-    const notifications = JSON.parse(localStorage.getItem('driverNotifications') || '[]');
-    notifications.push({
-        id: 'DNOTIF' + Date.now(),
-        driverName: driverName,
-        type: 'new_assignment',
-        message: `New trip assigned: ${requestId}`,
-        requestId: requestId,
-        timestamp: new Date().toISOString(),
-        read: false
-    });
-    localStorage.setItem('driverNotifications', JSON.stringify(notifications));
-}
-
 // =====================
 // NOTIFICATIONS
 // =====================
 
 function setupNotifications() {
-    // Check for new requests every 30 seconds
-    setInterval(() => {
-        const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
-        const unreadCount = notifications.filter(n => !n.read).length;
-        
-        const badge = document.querySelector('.notification-btn .badge');
-        if (badge) {
-            badge.textContent = unreadCount;
-            badge.style.display = unreadCount > 0 ? 'inline' : 'none';
+    // Poll notifications from server every 30 seconds
+    async function poll() {
+        try {
+            const res = await fetch('/api/notifications');
+            if (!res.ok) throw new Error('Failed to fetch notifications');
+            const notifications = await res.json();
+            const unreadCount = (notifications || []).filter(n => !n.read).length;
+            const badge = document.querySelector('.notification-btn .badge');
+            if (badge) {
+                badge.textContent = unreadCount;
+                badge.style.display = unreadCount > 0 ? 'inline' : 'none';
+            }
+                    if (unreadCount > 0) loadRequestsTable();
+                    loadActivities();
+        } catch (err) {
+            console.error('Notification poll failed', err);
         }
-        
-        if (unreadCount > 0) {
-            loadRequestsTable(); // Refresh requests table
-        }
-    }, 30000);
+    }
+
+    if (!isAuthenticated()) return; // don't poll until authenticated
+    poll();
+    setInterval(poll, 30000);
 }
 
 // =====================

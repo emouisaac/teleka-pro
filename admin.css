@@ -346,6 +346,12 @@ body.dark-mode {
     animation: fadeIn 0.3s ease;
 }
 
+/* When the admin view is locked, hide the whole admin container.
+   The login modal is outside the admin container so it remains visible. */
+body.locked .admin-container {
+    display: none;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;

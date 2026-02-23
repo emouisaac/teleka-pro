@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="locked">
     <div class="admin-container">
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
@@ -520,6 +520,24 @@
     </div>
 
     <!-- Modals -->
+    <!-- Admin Login Modal (production) -->
+    <div id="adminLoginModal" class="modal show">
+        <div class="modal-content">
+            <h2>Admin Login</h2>
+            <div style="margin: 15px 0;">
+                <label>Username</label>
+                <input id="adminUser" type="text" placeholder="Username" style="width:100%; padding:8px; margin-top:6px;" />
+            </div>
+            <div style="margin: 15px 0;">
+                <label>Password</label>
+                <input id="adminPass" type="password" placeholder="Password" style="width:100%; padding:8px; margin-top:6px;" />
+            </div>
+            <div style="text-align:right; margin-top:10px;">
+                <button class="btn-primary" id="adminLoginBtn">Login</button>
+            </div>
+            <p style="font-size:12px; color:var(--text-light); margin-top:10px;">Contact your system administrator if you do not have credentials.</p>
+        </div>
+    </div>
     <!-- Trip Details Modal -->
     <div id="tripModal" class="modal">
         <div class="modal-content">
