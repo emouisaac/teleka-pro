@@ -1,0 +1,125 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #6e6684a7;
+}
+.navbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #6e6684a7;
+    height: 80px;
+    width: 100%;
+    position: sticky;
+    top: 0;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    z-index: 999;
+}
+.navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0 2rem;
+    max-width: 1200px;
+}
+.navbar-logo {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #fff;
+    text-decoration: none;
+    cursor: pointer;
+}
+.navbar-menu {
+    display: flex;
+    text-align: center;
+    gap: 1.5rem;
+    list-style: none;
+
+}
+.navbar-menu li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.3rem;
+    font-weight: 500;
+    padding: 3px 20px;
+    border-radius: 20px;
+    border: 2px solid transparent;
+    transition: all 0.7s ease;
+    white-space: nowrap;
+}
+.navbar-menu li a:hover {
+    background-color: #b6b1b1;
+    color: #000000a7;
+    border: 2px solid #fff;
+}
+.navbar-toggle {
+    background: transparent;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    display: none;
+}
+.navbar-toggle .bar {
+    display: block;
+    width: 25px;
+    height: 3px;
+    margin: 5px auto;
+    background-color: #fff;
+    transition: all 0.3s ease;
+}
+@media (max-width: 768px) {
+    .navbar-menu {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.7rem !important;
+        position: absolute;
+        height: 100vh;
+        width: 200px;
+        top: 0;
+        right: 0;
+        padding: 5rem 1.5rem;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(10px);
+        background-color: #6e6684a7;
+        display: none;
+    }
+    .navbar-container .navbar-menu.active {
+        display: flex;
+    }
+    .navbar-toggle {
+        display: block;
+        z-index: 999;
+    }
+    .navbar-toggle.active .bar:nth-child(2) {
+        opacity: 0;
+    }
+    .navbar-toggle.active .bar:nth-child(1) {
+        transform: translateY(8px) rotate(45deg);
+    }
+    .navbar-toggle.active .bar:nth-child(3) {
+        transform: translateY(-8px) rotate(-45deg);
+    }
+}
+@media (max-width: 480px) {
+    .navbar-container {
+        padding: 0 1rem;
+    }
+    .navbar-logo {
+        font-size: 1.7rem;
+    }
+    .navbar-menu li a {
+        font-size: 1.2rem;
+        padding: 3px 15px;
+    }
+}
