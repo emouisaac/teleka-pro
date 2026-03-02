@@ -123,3 +123,132 @@ body {
         padding: 3px 15px;
     }
 }
+
+/* dashboard styles */
+.dashboard-container {
+    display: flex;
+    min-height: calc(100vh - 80px);
+}
+.sidebar {
+    width: 220px;
+    background: #4a3f6b;
+    color: #fff;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+}
+.sidebar-header {
+    text-align: center;
+    padding: 2rem 1rem;
+    background: #362d56;
+}
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+}
+.sidebar-menu li {
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+.sidebar-menu li:hover,
+.sidebar-menu li.active {
+    background: #584d7d;
+}
+.sidebar-menu .logout {
+    margin-top: auto;
+    padding-bottom: 2rem;
+    color: #ff6b6b;
+}
+.content {
+    flex-grow: 1;
+    background: #f4f4f9;
+    padding: 2rem;
+    overflow-y: auto;
+}
+.section {
+    display: none;
+}
+.section.active {
+    display: block;
+}
+.summary-cards {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+.card {
+    background: #fff;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    flex: 1 1 150px;
+    text-align: center;
+}
+.ride-form,
+.profile-form,
+.settings-form {
+    max-width: 500px;
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+.ride-form label,
+.profile-form label,
+.settings-form label {
+    font-weight: 600;
+}
+.ride-form input,
+.profile-form input,
+.settings-form input,
+.ride-form select {
+    padding: 0.6rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.btn {
+    background: #6e6684a7;
+    color: #fff;
+    padding: 0.8rem 1.2rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s;
+    align-self: flex-start;
+}
+.btn:hover {
+    background: #584d7d;
+}
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.history-table th,
+.history-table td {
+    border: 1px solid #ddd;
+    padding: 0.8rem;
+    text-align: left;
+}
+.history-table th {
+    background: #f0f0f0;
+}
+@media (max-width: 768px) {
+    .dashboard-container {
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 100%;
+        flex-direction: row;
+        overflow-x: auto;
+    }
+    .sidebar-menu li {
+        flex: 1;
+        text-align: center;
+    }
+}
