@@ -6,6 +6,33 @@ navbarToggle.addEventListener('click', () => {
     navbarToggle.classList.toggle('active');
 });
 
+// Dark Mode Toggle from Settings
+const darkModeToggle = document.querySelector('#dark-mode-toggle');
+
+// Check for saved dark mode preference in localStorage
+function initDarkMode() {
+    const isDarkMode = localStorage.getItem('darkMode') === 'true';
+    if (isDarkMode) {
+        document.body.classList.add('dark-mode');
+        if (darkModeToggle) darkModeToggle.checked = true;
+    } else {
+        document.body.classList.remove('dark-mode');
+        if (darkModeToggle) darkModeToggle.checked = false;
+    }
+}
+
+// Initialize dark mode on page load
+initDarkMode();
+
+// Toggle dark mode via settings checkbox
+if (darkModeToggle) {
+    darkModeToggle.addEventListener('change', () => {
+        document.body.classList.toggle('dark-mode');
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', isDarkMode);
+    });
+}
+
 // Function to switch sections from navbar clicks
 function switchSection(sectionId) {
     const sections = document.querySelectorAll('.content .section');
