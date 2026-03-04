@@ -43,6 +43,32 @@ if (darkModeToggle) {
     });
 }
 
+// Hero slider logic
+function initHeroSlider() {
+    const slides = document.querySelectorAll('.hero-content h1');
+    if (slides.length === 0) return;
+    let current = 0;
+    slides.forEach((s, i) => s.style.color = '');
+    slides[current].classList.add('active');
+    slides[current].style.color = 'orange';
+    setInterval(() => {
+        const prev = slides[current];
+        prev.classList.remove('active');
+        prev.classList.add('exit');
+        // prepare next
+        current = (current + 1) % slides.length;
+        const next = slides[current];
+        next.classList.remove('exit');
+        next.classList.add('active');
+        slides.forEach((s,i)=>{
+            s.style.color = i === current ? 'orange' : '';
+        });
+    }, 3000);
+}
+
+// initialize hero slider on DOMContentLoaded
+document.addEventListener('DOMContentLoaded', initHeroSlider);
+
 // Function to switch sections from navbar clicks
 function switchSection(sectionId) {
     const sections = document.querySelectorAll('.content .section');
