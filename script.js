@@ -9,9 +9,19 @@ navbarToggle.addEventListener('click', () => {
 // Dark Mode Toggle from Settings
 const darkModeToggle = document.querySelector('#dark-mode-toggle');
 
-// Check for saved dark mode preference in localStorage
+// Check for saved dark mode preference in localStorage or system settings
 function initDarkMode() {
-    const isDarkMode = localStorage.getItem('darkMode') === 'true';
+    let isDarkMode;
+    const stored = localStorage.getItem('darkMode');
+    if (stored !== null) {
+        isDarkMode = stored === 'true';
+    } else if (window.matchMedia) {
+        // default to system preference if no value stored yet
+        isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    } else {
+        isDarkMode = false;
+    }
+
     if (isDarkMode) {
         document.body.classList.add('dark-mode');
         if (darkModeToggle) darkModeToggle.checked = true;
