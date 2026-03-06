@@ -485,7 +485,7 @@ body {
     position: absolute;
     top: -50%;
     left: -50%;
-    width: 200px;
+    width: 100%;
     height: 200px;
     background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
     border-radius: 50%;
@@ -513,10 +513,7 @@ body {
     border-radius: 50%;
 }
 
-.card:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-lg);
-}
+
 
 .card h3 {
     color: #667eea;
@@ -531,8 +528,16 @@ body {
 .card p {
     color: var(--text-primary);
     font-size: 2rem;
-    font-weight: 700;
+    font-weight: 500;
     transition: color 0.3s ease;
+    text-align: center;
+}
+.card p a{
+    text-decoration: none;
+}
+.card p:hover {
+    scale: 1.1;
+    transition: 0.5s;
 }
 
 .ride-form,
@@ -630,7 +635,8 @@ body {
 
 .btn:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    background: linear-gradient(135deg, #0241c8 0%, #8043bd 100%);
+    box-shadow: 0 6px 20px rgba(234, 194, 102, 0.4);
 }
 
 .btn:active {
@@ -718,8 +724,16 @@ body.dark-mode .history-table tbody tr:hover {
         gap: 1rem;
     }
     .card {
-        flex: 1 1 150px;
-        padding: 1.5rem;
+        display: block;
+        width: 0;
+        padding: 1.5rem;        
+    }
+    .card .btn {
+        padding: 0.5rem;
+    }
+    .card h3 {
+        font-size: 0.8rem;
+        padding: 0;
     }
     .history-table {
         font-size: 0.85rem;
@@ -771,6 +785,12 @@ body.dark-mode .history-table tbody tr:hover {
     .card {
         flex: 1 1 100%;
     }
+    .card .btn {
+        padding: 0.4rem;
+        font-size: 0.7rem;
+    }
+    
+
     .ride-form,
     .profile-form,
     .settings-form {
