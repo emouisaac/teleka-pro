@@ -840,5 +840,77 @@ body.dark-mode .history-table tbody tr:hover {
     }
 }
 
+/*---------SERVICES SECTION------------*/
+/* Services */
+        .services {
+            background-color: rgba(86, 101, 121, 0.29);
+            padding: 50px 20px;
+            text-align: center;
+            width: 100;
+        }
+        .services h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+        .services p {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            color: var(--text-secondary);
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .service-card {
+            background-color: var(--sidebar-active-bg);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: var(--sidebar-active-border);
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        
+        .service-card .btn:hover {
+            transform: none;
+            background:#0241c8;
+        }
+        .service-card a {
+            text-decoration: none;
+        }
+
+        .service-icon {
+            width: 70px;
+            height: 70px;
+            background-color: rgba(29, 13, 208, 0.234);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 1.8rem;
+        }
+
+        .service-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--text);
+        }
+
+        .service-card p {
+            color: var(--text-light);
+            margin-bottom: 20px;
+        }
+        @media screen {
+            .service-card .btn:hover{
+                transform: none;
+            }
+            
+        }
 
 
