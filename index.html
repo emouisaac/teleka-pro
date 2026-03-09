@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teleka Taxi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -62,6 +63,8 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            
 
 
                 <!-- Services Section -->
@@ -86,7 +89,7 @@
                                 </div>
                                 <h3>City Rides</h3>
                                 <p>Comfortable rides within the city for business meetings, shopping, or leisure.</p>
-                                <a href="#booking" class="btn btn-outline">Book Now</a>
+                                <a href="#request" class="btn" onclick="switchSection('request')">Book Now</a>
                             </div>
                             <div class="service-card">
                                 <div class="service-icon">
@@ -94,7 +97,7 @@
                                 </div>
                                 <h3>Business Travel</h3>
                                 <p>Professional service for corporate clients with receipt generation for expenses.</p>
-                                <a href="#booking" class="btn btn-outline">Book Now</a>
+                                <a href="#request" class="btn" onclick="switchSection('request')">Book Now</a>
                             </div>
                             <div class="service-card">
                                 <div class="service-icon">
@@ -102,7 +105,72 @@
                                 </div>
                                 <h3>Tours Travel</h3>
                                 <p>Experience the beauty of our tourist sites with our exciting tour packages and expert guides.</p>
-                                <a href="#booking" class="btn btn-outline">Book Now</a>
+                                <a href="#request" class="btn" onclick="switchSection('request')">Book Now</a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                    
+                
+
+                <!-- Features Section -->
+                <section class="features" id="features">
+                    <div class="container">
+                        <div class="section-title">
+                            <h2>Why Choose Us</h2>
+                            <p>We provide the best taxi service with these outstanding features</p>
+                        </div>
+                        <div class="features-grid">
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <h3>Punctual Service</h3>
+                                <p>We value your time and ensure timely pickups and drop-offs.</p>
+                            </div>
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <h3>Safe & Secure</h3>
+                                <p>All our drivers are verified and vehicles are regularly maintained.</p>
+                            </div>
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                </div>
+                                <h3>Affordable Prices</h3>
+                                <p>Competitive pricing with no hidden charges for transparent billing.</p>
+                            </div>
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="fas fa-headset"></i>
+                                </div>
+                                <h3>24/7 Support</h3>
+                                <p>Round-the-clock customer support to assist you anytime.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                    
+                
+
+        
+                <section class="contact" id="contact">
+                    <div class="container">
+                        <div class="section-title">
+                            <h2>Contact Us</h2>
+                            <p>Get in touch with us for your transportation needs</p>
+                        </div>
+                        <div class="contact-container">
+                            <div class="contact-info">
+                                <div class="contact-card contact-card--clickable" role="button" tabindex="0" data-type="phone" data-value="+256788408032">
+                                    <i class="fas fa-phone"></i>
+                                    <h3>Call Us</h3>
+                                    <p class="contact-value">+256 788 408 032</p>
+                                    <p>24/7 Customer Support</p>
+                                </div>
+                                <!-- WhatsApp contact removed -->
                             </div>
                         </div>
                     </div>
@@ -213,7 +281,60 @@
                 </form>
             </div>
         </section>
+
+
+        
     </main>
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-col">
+                    <h3>Teleka Taxi</h3>
+                    <p>Your reliable partner for airport transfers and city rides. We ensure comfortable and safe journeys for all our customers.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#services">Services</a></li>
+                        <li><a href="#booking">Booking</a></li>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="../privacy-policy.html">Privacy Policy</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Services</h3>
+                    <ul>
+                        <li><a href="#">Airport Transfers</a></li>
+                        <li><a href="#">City Rides</a></li>
+                        <li><a href="#">Business Travel</a></li>
+                        <li><a href="#">Corporate Accounts</a></li>
+                        <li><a href="#">Luxury Rides</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Contact Us</h3>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> Kampala, Uganda</li>
+                        <li><i class="fas fa-phone"></i> +256 788408032</li>
+                        <li><i class="fas fa-envelope"></i> info@teleka.com</li>
+                        <li><i class="fas fa-clock"></i> Available 24/7</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 Teleka Taxi. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
 
 </body>
 <script src="script.js"></script>
