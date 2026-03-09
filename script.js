@@ -67,7 +67,18 @@ function initHeroSlider() {
 }
 
 // initialize hero slider on DOMContentLoaded
-document.addEventListener('DOMContentLoaded', initHeroSlider);
+document.addEventListener('DOMContentLoaded', function() {
+    initHeroSlider();
+    
+    // Ensure other sections are visible when dashboard is active on page load
+    const activeSection = document.querySelector('.content .section.active');
+    if (activeSection && activeSection.id === 'dashboard') {
+        const otherSections = document.querySelectorAll('.services, .features, .contact');
+        otherSections.forEach(section => {
+            section.style.display = 'block';
+        });
+    }
+});
 
 // Function to switch sections from navbar clicks
 function switchSection(sectionId) {
@@ -89,6 +100,20 @@ function switchSection(sectionId) {
             item.classList.remove('active');
         }
     });
+
+    // Show/hide other content sections based on whether dashboard is active
+    const otherSections = document.querySelectorAll('.services, .features, .contact');
+    if (sectionId === 'dashboard') {
+        // Show all other sections when dashboard is active
+        otherSections.forEach(section => {
+            section.style.display = 'block';
+        });
+    } else {
+        // Hide all other sections when any other section is active
+        otherSections.forEach(section => {
+            section.style.display = 'none';
+        });
+    }
 
     // Close mobile menu after selection
     navbarMenu.classList.remove('active');
