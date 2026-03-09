@@ -196,3 +196,14 @@ function addServiceIcons() {
 
 // Call the function when the page loads
 document.addEventListener('DOMContentLoaded', addServiceIcons);
+
+// Footer toggle functionality for small screens
+document.addEventListener('DOMContentLoaded', () => {
+    const footerToggles = document.querySelectorAll('.footer-toggle');
+    footerToggles.forEach(toggle => {
+        toggle.addEventListener('click', () => {
+            const content = toggle.nextElementSibling;
+            content.classList.toggle('active');
+        });
+    });
+});
