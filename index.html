@@ -6,11 +6,14 @@
     <title>Teleka Taxi</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <link rel="icon" type="image/png" href="ims/t2icon.png">
 </head>
 <body>
    <nav class="navbar">
         <div class="navbar-container">
             <a href="index.html" class="navbar-logo"><img src="ims/ticon.png" alt="Teleka Logo"></a>
+            <div id="current-date" class="navbar-date" aria-label="Current date"></div>
             <button class="navbar-toggle" id="mobile-menu">
                 <span class="bar"></span>
                 <span class="bar"></span>
@@ -24,8 +27,9 @@
                 <li><a href="#payments" class="navbar-link" onclick="switchSection('payments')">Payment Methods</a></li>
                 <li><a href="#profile" class="navbar-link" onclick="switchSection('profile')">Profile</a></li>
                 <li><a href="#support" class="navbar-link" onclick="switchSection('support')">Support</a></li>
+                <li><a href="#chat" class="navbar-link" onclick="switchSection('chat')">Chat</a></li>
                 <li><a href="#settings" class="navbar-link" onclick="switchSection('settings')">Settings</a></li>
-                <li><a href="#dashboard" class="logout" onclick="logout()">Logout</a></li>
+                <li><a href="#" id="auth-action" class="navbar-link" onclick="handleAuthClick(event)">Login</a></li>
             </ul>
         </div>
    </nav>
@@ -180,67 +184,132 @@
             </div>
             <div id="request" class="section">
                 <h1>Request a Ride</h1>
-                <form class="ride-form">
-                    <label>Pickup Location</label>
-                    <input type="text" placeholder="Enter pickup address" required>
+                <div class="request-grid">
+                    <form class="ride-form" id="ride-form">
+                        <label>Pickup Location</label>
+                        <input id="pickup-location" type="text" placeholder="Enter pickup address" autocomplete="off" required>
 
-                    <label>Dropoff Location</label>
-                    <input type="text" placeholder="Enter dropoff address" required>
+                        <label>Dropoff Location</label>
+                        <input id="dropoff-location" type="text" placeholder="Enter dropoff address" autocomplete="off" required>
 
-                    <label>Date &amp; Time</label>
-                    <input type="datetime-local" required>
+                        <label>Date &amp; Time</label>
+                        <input id="ride-date" type="datetime-local" required>
 
-                    <label>Car Type</label>
-                    <select required>
-                        <option value="standard">Standard</option>
-                        <option value="premium">Premium</option>
-                        <option value="suv">SUV</option>
-                    </select>
+                        <label class="select-label">Car Type</label>
+                        <select id="car-type" required>
+                            <option value="standard">Standard</option>
+                            <option value="premium">Premium</option>
+                            <option value="suv">SUV</option>
+                        </select>
 
-                    <label>Payment Method</label>
-                    <select required>
-                        <option value="card">Credit/Debit Card</option>
-                        <option value="cash">Cash</option>
-                        <option value="wallet">Wallet</option>
-                    </select>
+                        <label class="select-label">Payment Method</label>
+                        <select id="payment-method" required>
+                            <option value="card">Credit/Debit Card</option>
+                            <option value="cash">Cash</option>
+                            <option value="wallet">Wallet</option>
+                        </select>
 
-                    <button type="submit" class="btn">Submit Request</button>
-                </form>
-            </div>
-            <div id="history" class="section">
-            
-                <h1>Ride Status</h1>
-                <table class="history-table">
-                    <div class="summary-cards">
-                        <div class="card">
-                            <h3>Upcoming Ride</h3>
-                            <p>No rides scheduled</p>
+                        <div class="fare-estimate">
+                            <div>
+                                <strong>Estimated Fare</strong>
+                                <p class="estimate-subtitle">Based on route distance</p>
+                            </div>
+                            <div>
+                                <span id="fare-amount">UGX 0</span>
+                            </div>
                         </div>
-                        <div class="card1">
-                            <div class="card">
-                                <h3>Total Rides</h3>
-                                <p>0</p>
+
+                        <button type="submit" class="btn">Request Ride</button>
+                    </form>
+
+                    <div class="map-panel">
+                        <div id="map"></div>
+                        <p class="map-hint">Pickup and dropoff autofill powered by Google Places. Route appears here.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="history" class="section">
+                <h1>Ride Status</h1>
+
+                <div class="ride-status-shell">
+                    <div class="ride-status-hero">
+                        <div class="ride-status-copy">
+                            <span class="ride-status-kicker">Live Trip Monitor</span>
+                            <h2>Upcoming Ride</h2>
+                            <p id="upcoming-ride-status" class="ride-status-title">No rides scheduled</p>
+                            <p id="active-driver-contact" class="ride-status-subtitle">Driver contact will appear after acceptance.</p>
+                            <div id="active-driver-media" class="driver-media hidden">
+                                <div class="driver-media-card">
+                                    <span class="ride-status-kicker">Driver</span>
+                                    <img id="active-driver-avatar" class="driver-media-image" alt="Assigned driver photo">
+                                </div>
+                                <div class="driver-media-card">
+                                    <span class="ride-status-kicker">Vehicle</span>
+                                    <img id="active-driver-car" class="driver-media-image" alt="Assigned driver car photo">
+                                </div>
                             </div>
-                            <div class="card">
-                                <h3>Account Balance</h3>
-                                <p>$0.00</p>
-                            </div>
+                        </div>
+                        <div class="ride-status-badge">
+                            <span class="ride-status-badge-label">Status</span>
+                            <strong>Live</strong>
                         </div>
                     </div>
-                    <h1>Ride History</h1>
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Pickup</th>
-                            <th>Dropoff</th>
-                            <th>Fare</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td colspan="5">No rides yet.</td></tr>
-                    </tbody>
-                </table>
+
+                    <div class="ride-status-stats">
+                        <div class="ride-status-stat">
+                            <span class="ride-status-stat-label">Total Rides</span>
+                            <strong id="total-rides-count">0</strong>
+                            <p>All requests linked to your account.</p>
+                        </div>
+                        <div class="ride-status-stat">
+                            <span class="ride-status-stat-label">Completed Spend</span>
+                            <strong id="account-balance">UGX 0</strong>
+                            <p>Total confirmed spend from completed rides.</p>
+                        </div>
+                        <div class="ride-status-stat ride-status-stat--accent">
+                            <span class="ride-status-stat-label">Driver Contact</span>
+                            <strong>Available after acceptance</strong>
+                            <p>Call details and chat access appear as soon as a driver is assigned.</p>
+                        </div>
+                    </div>
+
+                    <div class="map-card">
+                        <h3>Driver Conversation</h3>
+                        <p id="customer-chat-summary">Chat becomes active when a driver accepts your ride.</p>
+                        <div id="customer-chat-preview" class="notifications-list">
+                            <div class="notification-empty">
+                                <p>No messages yet.</p>
+                            </div>
+                        </div>
+                        <form id="customer-chat-form" class="profile-form">
+                            <label for="customer-chat-input">Reply to Driver</label>
+                            <textarea id="customer-chat-input" rows="4" placeholder="Type your message to the driver..." required></textarea>
+                            <div class="actions-row">
+                                <button id="customer-chat-send" type="submit" class="btn">Send Message</button>
+                                <a id="customer-chat-link" href="chat.html?role=customer" class="btn">Open Chat</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <h1>Ride History</h1>
+                <div class="history-table-wrap">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Pickup</th>
+                                <th>Dropoff</th>
+                                <th>Fare</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ride-history-body">
+                            <tr><td colspan="5">No rides yet.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
             <div id="payments" class="section">
                 <h1>Payment Methods</h1>
@@ -249,15 +318,15 @@
             </div>
             <div id="profile" class="section">
                 <h1>Profile</h1>
-                <form class="profile-form">
+                <form class="profile-form" id="customer-profile-form">
                     <label>Full Name</label>
-                    <input type="text" value="[Customer Name]" required>
+                    <input id="customer-name" type="text" placeholder="Enter your full name" required>
 
                     <label>Email</label>
-                    <input type="email" value="customer@example.com" required>
+                    <input id="customer-email" type="email" placeholder="Enter your email" required>
 
                     <label>Phone</label>
-                    <input type="tel" value="+1234567890" required>
+                    <input id="customer-phone" type="tel" placeholder="+256..." required>
 
                     <button type="submit" class="btn">Update Profile</button>
                 </form>
@@ -265,6 +334,13 @@
             <div id="support" class="section">
                 <h1>Support</h1>
                 <p>If you need help, contact us at <a href="mailto:support@teleka.com">support@teleka.com</a> or use the live chat below.</p>
+            </div>
+            <div id="chat" class="section">
+                <h1>Ride Chat</h1>
+                <p>Open your live chat with the assigned driver when your ride has been accepted.</p>
+                <div class="actions-row">
+                    <a id="customer-chat-link-secondary" href="chat.html?role=customer" class="btn">Open Chat</a>
+                </div>
             </div>
             <div id="settings" class="section">
                 <h1>Settings</h1>
@@ -336,6 +412,10 @@
         </div>
     </footer>
 
-</body>
+<script>
+    // Provide Google client ID to the page via JS global (injected by server)
+    window.GOOGLE_CLIENT_ID = '{{GOOGLE_CLIENT_ID}}';
+</script>
 <script src="script.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{GOOGLE_MAPS_API_KEY}}&libraries=places&callback=initRideRequest" async defer></script>
 </html>
