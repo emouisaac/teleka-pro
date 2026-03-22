@@ -121,8 +121,8 @@
               </div>
               <form id="driverLoginForm" class="profile-form driver-auth-form">
                 <div class="form-grid">
-                  <label>Phone</label>
-                  <input id="driverLoginPhone" type="tel" placeholder="+256..." required />
+                  <label>Email</label>
+                  <input id="driverLoginEmail" type="email" placeholder="your@email.com" required />
                   <label>Password</label>
                   <input id="driverLoginPassword" type="password" placeholder="Enter your password" required />
                 </div>
@@ -146,6 +146,8 @@
                 <div class="form-grid">
                   <label>Full Name</label>
                   <input id="registerName" type="text" required />
+                  <label>Email</label>
+                  <input id="registerEmail" type="email" required />
                   <label>Phone</label>
                   <input id="registerPhone" type="tel" required />
                   <label>Vehicle</label>
@@ -588,6 +590,123 @@
         const app = document.querySelector('.driver-app');
         app.classList.toggle('nav-open');
     }
+
+    // Driver authentication
+    let driverToken = localStorage.getItem('driverToken');
+
+    async function checkDriverAuth() {
+        if (driverToken) {
+            // Verify token
+            try {
+                const response = await fetch('/auth/driver/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: driverToken })
+                });
+                const data = await response.json();
+                if (data.valid) {
+                    showDriverDashboard(data.driver);
+                    return;
+                }
+            } catch (error) {
+                console.error('Token verification failed:', error);
+            }
+        }
+        showDriverAuth();
+    }
+
+    function showDriverAuth() {
+        document.getElementById('driverAuthPanel').style.display = 'block';
+        document.querySelectorAll('.driver-section:not(#driverAuthPanel)').forEach(section => {
+            section.style.display = 'none';
+        });
+    }
+
+    function showDriverDashboard(driver) {
+        document.getElementById('driverAuthPanel').style.display = 'none';
+        document.querySelectorAll('.driver-section:not(#driverAuthPanel)').forEach(section => {
+            section.style.display = 'block';
+        });
+        document.getElementById('driverName').textContent = driver.name;
+    }
+
+    // Login form
+    document.getElementById('driverLoginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const email = document.getElementById('driverLoginEmail').value;
+        const password = document.getElementById('driverLoginPassword').value;
+
+        try {
+            const response = await fetch('/auth/driver/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await response.json();
+            if (data.success) {
+                driverToken = data.token;
+                localStorage.setItem('driverToken', driverToken);
+                showDriverDashboard(data.driver);
+            } else {
+                alert(data.error || 'Login failed');
+            }
+        } catch (error) {
+            console.error('Login failed:', error);
+            alert('Login failed');
+        }
+    });
+
+    // Registration form
+    document.getElementById('driverRegisterForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = {
+            name: document.getElementById('registerName').value,
+            email: document.getElementById('registerEmail').value,
+            phone: document.getElementById('registerPhone').value,
+            vehicleInfo: document.getElementById('registerVehicle').value,
+            licenseNumber: document.getElementById('registerLicenseNumber').value,
+            password: document.getElementById('registerPassword').value
+        };
+
+        try {
+            const response = await fetch('/auth/driver/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+            const data = await response.json();
+            if (data.success) {
+                alert(data.message);
+                document.getElementById('showLoginForm').click();
+            } else {
+                alert(data.error || 'Registration failed');
+            }
+        } catch (error) {
+            console.error('Registration failed:', error);
+            alert('Registration failed');
+        }
+    });
+
+    // Toggle forms
+    document.getElementById('showRegisterForm').addEventListener('click', function() {
+        document.querySelector('.driver-auth-card--login').classList.add('hidden');
+        document.getElementById('driverRegisterCard').classList.remove('hidden');
+    });
+
+    document.getElementById('showLoginForm').addEventListener('click', function() {
+        document.getElementById('driverRegisterCard').classList.add('hidden');
+        document.querySelector('.driver-auth-card--login').classList.remove('hidden');
+    });
+
+    // Logout
+    document.getElementById('sidebarLogoutBtn').addEventListener('click', function() {
+        driverToken = null;
+        localStorage.removeItem('driverToken');
+        showDriverAuth();
+    });
+
+    // Check auth on load
+    document.addEventListener('DOMContentLoaded', checkDriverAuth);
   </script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="driver.js"></script>

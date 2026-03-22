@@ -446,6 +446,140 @@
         const sidebar = document.querySelector('.sidebar');
         sidebar.classList.toggle('open');
     }
+
+    // Admin authentication
+    async function checkAdminAuth() {
+        try {
+            const response = await fetch('/auth/status', { credentials: 'include' });
+            const data = await response.json();
+            if (data.authenticated && data.user.role === 'admin') {
+                document.getElementById('adminAuthPanel').style.display = 'none';
+                document.getElementById('overview').style.display = 'block';
+                // Show other admin sections
+                document.querySelectorAll('.section:not(#adminAuthPanel)').forEach(section => {
+                    section.style.display = 'block';
+                });
+            } else {
+                document.getElementById('adminAuthPanel').style.display = 'block';
+                document.querySelectorAll('.section:not(#adminAuthPanel)').forEach(section => {
+                    section.style.display = 'none';
+                });
+            }
+        } catch (error) {
+            console.error('Auth check failed:', error);
+        }
+    }
+
+    document.getElementById('adminLoginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const email = document.getElementById('adminEmail').value;
+        const password = document.getElementById('adminPassword').value;
+
+        try {
+            const response = await fetch('/auth/admin/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ email, password })
+            });
+            const data = await response.json();
+            if (data.success) {
+                checkAdminAuth();
+            } else {
+                alert('Invalid credentials');
+            }
+        } catch (error) {
+            console.error('Login failed:', error);
+            alert('Login failed');
+        }
+    });
+
+    document.getElementById('adminSidebarLogout').addEventListener('click', async function() {
+        try {
+            await fetch('/auth/admin/logout', { method: 'POST', credentials: 'include' });
+            checkAdminAuth();
+        } catch (error) {
+            console.error('Logout failed:', error);
+        }
+    });
+
+    // Check auth on load
+    document.addEventListener('DOMContentLoaded', function() {
+        checkAdminAuth();
+        loadDriverApplications();
+    });
+
+    async function loadDriverApplications() {
+        try {
+            const response = await fetch('/api/drivers/pending', { credentials: 'include' });
+            const drivers = await response.json();
+            const tbody = document.getElementById('driverApplicationsBody');
+            tbody.innerHTML = '';
+
+            drivers.forEach(driver => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${driver.name}</td>
+                    <td>${driver.phone}</td>
+                    <td>${driver.vehicle_info}</td>
+                    <td><button class="btn small" onclick="viewDocuments(${driver.id})">View</button></td>
+                    <td><span class="status-badge pending">${driver.status}</span></td>
+                    <td>
+                        <button class="btn small primary" onclick="approveDriver(${driver.id})">Approve</button>
+                        <button class="btn small secondary" onclick="rejectDriver(${driver.id})">Reject</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Failed to load driver applications:', error);
+        }
+    }
+
+    async function approveDriver(driverId) {
+        try {
+            const response = await fetch(`/api/drivers/approve/${driverId}`, {
+                method: 'POST',
+                credentials: 'include'
+            });
+            const data = await response.json();
+            if (data.success) {
+                loadDriverApplications();
+                alert('Driver approved successfully');
+            } else {
+                alert('Failed to approve driver');
+            }
+        } catch (error) {
+            console.error('Approval failed:', error);
+            alert('Approval failed');
+        }
+    }
+
+    async function rejectDriver(driverId) {
+        if (confirm('Are you sure you want to reject this driver application?')) {
+            try {
+                const response = await fetch(`/api/drivers/reject/${driverId}`, {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                if (data.success) {
+                    loadDriverApplications();
+                    alert('Driver application rejected');
+                } else {
+                    alert('Failed to reject driver');
+                }
+            } catch (error) {
+                console.error('Rejection failed:', error);
+                alert('Rejection failed');
+            }
+        }
+    }
+
+    function viewDocuments(driverId) {
+        // For now, just show a placeholder
+        alert('Document viewing not implemented yet. Driver ID: ' + driverId);
+    }
   </script>
   <script src="app.js"></script>
 </body>
