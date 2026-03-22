@@ -52,7 +52,7 @@
       </ul>
 
       <div class="sidebar-footer">
-        <button class="btn small" id="toggleSidebar" aria-label="Toggle sidebar">
+        <button class="btn small" id="toggleSidebar" aria-label="Toggle sidebar" onclick="toggleSidebar()">
           <i class="fas fa-angle-left"></i>
           <span class="toggle-label">Collapse</span>
         </button>
@@ -62,7 +62,7 @@
     <main class="content" role="main">
       <header class="topbar">
         <div class="topbar-left">
-          <button class="icon-btn" id="mobileSidebarToggle" aria-label="Open navigation">
+          <button class="icon-btn" id="mobileSidebarToggle" aria-label="Open navigation" onclick="toggleSidebar()">
             <i class="fas fa-bars"></i>
           </button>
           <div class="page-header">
@@ -441,6 +441,12 @@
     </main>
   </div>
 
+  <script>
+    function toggleSidebar() {
+        const sidebar = document.querySelector('.sidebar');
+        sidebar.classList.toggle('open');
+    }
+  </script>
   <script src="app.js"></script>
 </body>
 </html>

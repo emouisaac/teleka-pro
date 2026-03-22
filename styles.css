@@ -2496,7 +2496,7 @@ footer {
     transform: translateY(0);
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
     .topbar {
         flex-direction: column;
         align-items: flex-start;
@@ -2518,6 +2518,7 @@ footer {
         transform: translateX(-100%);
         transition: transform 0.3s ease;
         width: 280px;
+        height: 100vh;
         background: var(--card-bg);
         border-right: 1px solid rgba(0, 0, 0, 0.08);
         box-shadow: 6px 0 18px rgba(0, 0, 0, 0.25);
@@ -3652,7 +3653,7 @@ footer {
     font-size: 1.1rem;
 }
 
-@media (min-width: 900px) {
+@media (min-width: 769px) {
     .driver-main {
         display: flex;
         margin-left: 240px;
@@ -3672,20 +3673,24 @@ footer {
     }
 }
 
-@media (max-width: 899px) {
-    .driver-auth-shell {
-        grid-template-columns: 1fr;
+@media (min-width: 769px) {
+    #mobileSidebarToggle {
+        display: none;
     }
+}
 
+@media (min-width: 769px) {
+    #menuToggle {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
     .driver-sidebar {
         transform: translateX(-100%);
     }
 
     .driver-app.nav-open .driver-sidebar {
         transform: translateX(0);
-    }
-
-    .driver-main {
-        padding-bottom: 72px;
     }
 }

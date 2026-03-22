@@ -12,7 +12,7 @@
   <div class="driver-app">
     <header class="driver-topbar">
       <div class="driver-topbar-left">
-        <button class="icon-btn" id="menuToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="driverSidebar" title="Menu">
+        <button class="icon-btn" id="menuToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="driverSidebar" title="Menu" onclick="toggleDriverMenu()">
           <i class="fas fa-bars"></i>
         </button>
         <img class="driver-avatar" id="driverAvatar" src="https://ui-avatars.com/api/?name=Driver&background=667eea&color=fff&rounded=true&size=80" alt="Driver profile" />
@@ -583,6 +583,12 @@
     </footer>
   </div>
 
+  <script>
+    function toggleDriverMenu() {
+        const app = document.querySelector('.driver-app');
+        app.classList.toggle('nav-open');
+    }
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="driver.js"></script>
 </body>

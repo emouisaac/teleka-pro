@@ -14,7 +14,7 @@
         <div class="navbar-container">
             <a href="index.html" class="navbar-logo"><img src="ims/ticon.png" alt="Teleka Logo"></a>
             <div id="current-date" class="navbar-date" aria-label="Current date"></div>
-            <button class="navbar-toggle" id="mobile-menu">
+            <button class="navbar-toggle" id="mobile-menu" onclick="toggleMobileMenu()">
                 <span class="bar"></span>
                 <span class="bar"></span>
                 <span class="bar"></span>
@@ -415,6 +415,14 @@
 <script>
     // Provide Google client ID to the page via JS global (injected by server)
     window.GOOGLE_CLIENT_ID = '{{GOOGLE_CLIENT_ID}}';
+</script>
+<script>
+    function toggleMobileMenu() {
+        const menu = document.querySelector('.navbar-menu');
+        const toggle = document.querySelector('.navbar-toggle');
+        menu.classList.toggle('active');
+        toggle.classList.toggle('active');
+    }
 </script>
 <script src="script.js"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key={{GOOGLE_MAPS_API_KEY}}&libraries=places&callback=initRideRequest" async defer></script>
