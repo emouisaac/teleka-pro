@@ -20,6 +20,45 @@ function resetSidebarOnResize() {
     }
 }
 
+function showAdminSection(sectionId) {
+    const sections = document.querySelectorAll('.section');
+    sections.forEach(section => {
+        if (section.id === sectionId) {
+            section.classList.add('active');
+        } else {
+            section.classList.remove('active');
+        }
+    });
+}
+
+function activateSidebarMenu() {
+    const items = document.querySelectorAll('.sidebar-item[data-section]');
+    if (!items.length) return;
+
+    items.forEach(item => {
+        item.addEventListener('click', () => {
+            items.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+            const target = item.getAttribute('data-section');
+            if (target) {
+                showAdminSection(target);
+            }
+
+            if (window.innerWidth <= 768) {
+                const sidebar = document.querySelector('.sidebar');
+                if (sidebar) sidebar.classList.remove('open');
+            }
+        });
+    });
+
+    // Ensure first section is active at load
+    const initial = document.querySelector('.sidebar-item[data-section].active') || items[0];
+    if (initial) {
+        initial.classList.add('active');
+        showAdminSection(initial.getAttribute('data-section'));
+    }
+}
+
 // Admin authentication
 async function checkAdminAuth() {
     try {
@@ -99,6 +138,7 @@ document.getElementById('adminSidebarLogout').addEventListener('click', async fu
 document.addEventListener('DOMContentLoaded', function() {
     checkAdminAuth();
     loadDriverApplications();
+    activateSidebarMenu();
 
     document.addEventListener('click', closeSidebarOnClickOutside);
     window.addEventListener('resize', resetSidebarOnResize);
