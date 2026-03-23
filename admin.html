@@ -10,7 +10,7 @@
 </head>
 <body>
   <div class="dashboard-container">
-    <aside class="sidebar" aria-label="Main navigation">
+    <aside class="sidebar hidden" aria-label="Main navigation">
       <div class="sidebar-header">
         <img src="ims/ticon.png" alt="Teleka Logo" class="sidebar-logo" />
         <span class="sidebar-title">Teleka Admin</span>
@@ -59,51 +59,45 @@
       </div>
     </aside>
 
-    <main class="content" role="main">
-      <header class="topbar">
-        <div class="topbar-left">
-          <button class="icon-btn" id="mobileSidebarToggle" aria-label="Open navigation" onclick="toggleSidebar()">
-            <i class="fas fa-bars"></i>
-          </button>
-          <div class="page-header">
-            <h1 class="page-title">Overview</h1>
-            <p class="page-subtitle">Operational control for customers, drivers, rides, revenue, and dispatch settings.</p>
+      <header class="topbar hidden">
+          <div class="topbar-content">
+            <button id="adminSidebarToggle" class="sidebar-toggle-btn" type="button" onclick="toggleSidebar()" aria-label="Toggle admin menu">
+              <i class="fas fa-bars"></i>
+            </button>
+            <h1>Teleka Admin Panel</h1>
           </div>
-        </div>
-
-        <div class="topbar-right">
-          <button class="icon-btn" id="notifToggle" aria-label="Notifications">
-            <i class="fas fa-bell"></i>
-            <span class="badge" id="notifCount" aria-label="Unread notifications">0</span>
-          </button>
-        </div>
       </header>
+    
 
-      <div class="main-content" id="mainContent">
-        <section id="adminAuthPanel" class="section active">
-          <div class="section-header">
-            <h2>Admin Sign In</h2>
-            <p>Authenticated admin access is required for operational data and platform controls.</p>
-          </div>
+    <!-- Login Panel - Always visible when not authenticated -->
+    <div id="adminAuthPanel" class="auth-overlay">
+      <div class="auth-container">
+        <div class="section-header">
+          <h2>Admin Sign In</h2>
+          <p>Authenticated admin access is required for operational data and platform controls.</p>
+        </div>
 
-          <div class="panel">
-            <form class="settings-form" id="adminLoginForm">
-              <div class="form-grid">
-                <div class="form-row">
-                  <label>Email</label>
-                  <input id="adminEmail" type="email" required />
-                </div>
-                <div class="form-row">
-                  <label>Password</label>
-                  <input id="adminPassword" type="password" required />
-                </div>
+        <div class="panel">
+          <form class="settings-form" id="adminLoginForm">
+            <div class="form-grid">
+              <div class="form-row">
+                <label>Email</label>
+                <input id="adminEmail" type="email" required />
               </div>
-              <div class="form-actions">
-                <button class="btn" type="submit">Sign In</button>
+              <div class="form-row">
+                <label>Password</label>
+                <input id="adminPassword" type="password" required />
               </div>
-            </form>
-          </div>
-        </section>
+            </div>
+            <div class="form-actions">
+              <button class="btn" type="submit">Sign In</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <main class="content hidden" role="main">
 
         <section id="overview" class="section active">
           <div class="section-header">
@@ -441,146 +435,6 @@
     </main>
   </div>
 
-  <script>
-    function toggleSidebar() {
-        const sidebar = document.querySelector('.sidebar');
-        sidebar.classList.toggle('open');
-    }
-
-    // Admin authentication
-    async function checkAdminAuth() {
-        try {
-            const response = await fetch('/auth/status', { credentials: 'include' });
-            const data = await response.json();
-            if (data.authenticated && data.user.role === 'admin') {
-                document.getElementById('adminAuthPanel').style.display = 'none';
-                document.getElementById('overview').style.display = 'block';
-                // Show other admin sections
-                document.querySelectorAll('.section:not(#adminAuthPanel)').forEach(section => {
-                    section.style.display = 'block';
-                });
-            } else {
-                document.getElementById('adminAuthPanel').style.display = 'block';
-                document.querySelectorAll('.section:not(#adminAuthPanel)').forEach(section => {
-                    section.style.display = 'none';
-                });
-            }
-        } catch (error) {
-            console.error('Auth check failed:', error);
-        }
-    }
-
-    document.getElementById('adminLoginForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const email = document.getElementById('adminEmail').value;
-        const password = document.getElementById('adminPassword').value;
-
-        try {
-            const response = await fetch('/auth/admin/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ email, password })
-            });
-            const data = await response.json();
-            if (data.success) {
-                checkAdminAuth();
-            } else {
-                alert('Invalid credentials');
-            }
-        } catch (error) {
-            console.error('Login failed:', error);
-            alert('Login failed');
-        }
-    });
-
-    document.getElementById('adminSidebarLogout').addEventListener('click', async function() {
-        try {
-            await fetch('/auth/admin/logout', { method: 'POST', credentials: 'include' });
-            checkAdminAuth();
-        } catch (error) {
-            console.error('Logout failed:', error);
-        }
-    });
-
-    // Check auth on load
-    document.addEventListener('DOMContentLoaded', function() {
-        checkAdminAuth();
-        loadDriverApplications();
-    });
-
-    async function loadDriverApplications() {
-        try {
-            const response = await fetch('/api/drivers/pending', { credentials: 'include' });
-            const drivers = await response.json();
-            const tbody = document.getElementById('driverApplicationsBody');
-            tbody.innerHTML = '';
-
-            drivers.forEach(driver => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${driver.name}</td>
-                    <td>${driver.phone}</td>
-                    <td>${driver.vehicle_info}</td>
-                    <td><button class="btn small" onclick="viewDocuments(${driver.id})">View</button></td>
-                    <td><span class="status-badge pending">${driver.status}</span></td>
-                    <td>
-                        <button class="btn small primary" onclick="approveDriver(${driver.id})">Approve</button>
-                        <button class="btn small secondary" onclick="rejectDriver(${driver.id})">Reject</button>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-        } catch (error) {
-            console.error('Failed to load driver applications:', error);
-        }
-    }
-
-    async function approveDriver(driverId) {
-        try {
-            const response = await fetch(`/api/drivers/approve/${driverId}`, {
-                method: 'POST',
-                credentials: 'include'
-            });
-            const data = await response.json();
-            if (data.success) {
-                loadDriverApplications();
-                alert('Driver approved successfully');
-            } else {
-                alert('Failed to approve driver');
-            }
-        } catch (error) {
-            console.error('Approval failed:', error);
-            alert('Approval failed');
-        }
-    }
-
-    async function rejectDriver(driverId) {
-        if (confirm('Are you sure you want to reject this driver application?')) {
-            try {
-                const response = await fetch(`/api/drivers/reject/${driverId}`, {
-                    method: 'POST',
-                    credentials: 'include'
-                });
-                const data = await response.json();
-                if (data.success) {
-                    loadDriverApplications();
-                    alert('Driver application rejected');
-                } else {
-                    alert('Failed to reject driver');
-                }
-            } catch (error) {
-                console.error('Rejection failed:', error);
-                alert('Rejection failed');
-            }
-        }
-    }
-
-    function viewDocuments(driverId) {
-        // For now, just show a placeholder
-        alert('Document viewing not implemented yet. Driver ID: ' + driverId);
-    }
-  </script>
   <script src="app.js"></script>
 </body>
 </html>

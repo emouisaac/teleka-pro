@@ -27,6 +27,9 @@ A full-stack taxi service application with authentication for customers, admins,
    ```
 
 4. Open browser to `http://localhost:3000`
+5. Open browser to `http://localhost:3000/admin`
+6. Open browser to `http://localhost:3000/driver`
+
 
 ## Authentication
 
