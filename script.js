@@ -8,6 +8,40 @@ function toggleMobileMenu() {
     toggle.classList.toggle('active');
 }
 
+function setActiveNavbarItem(sectionId) {
+    const menuItems = document.querySelectorAll('.navbar-menu li');
+    menuItems.forEach(item => {
+        const link = item.querySelector('.navbar-link');
+        const href = link?.getAttribute('href') || '';
+        const isSectionLink = href.startsWith('#') && href.length > 1;
+        const isActive = isSectionLink && href.slice(1) === sectionId;
+
+        item.classList.toggle('active', isActive);
+        link?.classList.toggle('active', isActive);
+    });
+}
+
+function switchSection(sectionId) {
+    const targetSection = document.getElementById(sectionId);
+    if (!targetSection) return;
+
+    const sections = document.querySelectorAll('main .section[id]');
+    sections.forEach(section => {
+        section.classList.toggle('active', section.id === sectionId);
+    });
+
+    setActiveNavbarItem(sectionId);
+
+    if (window.location.hash !== `#${sectionId}`) {
+        history.replaceState(null, '', `#${sectionId}`);
+    }
+
+    const menu = document.querySelector('.navbar-menu');
+    const toggle = document.querySelector('.navbar-toggle');
+    if (menu?.classList.contains('active')) menu.classList.remove('active');
+    if (toggle?.classList.contains('active')) toggle.classList.remove('active');
+}
+
 // Authentication functions
 async function checkAuthStatus() {
     try {
@@ -61,6 +95,20 @@ function handleGoogleSignIn(response) {
 // Check auth status on page load
 document.addEventListener('DOMContentLoaded', function() {
     checkAuthStatus();
+    const initialSection = window.location.hash.slice(1);
+    if (initialSection && document.getElementById(initialSection)) {
+        switchSection(initialSection);
+    } else {
+        switchSection('dashboard');
+    }
+
+    window.addEventListener('hashchange', () => {
+        const hashSection = window.location.hash.slice(1);
+        if (hashSection && document.getElementById(hashSection)) {
+            switchSection(hashSection);
+        }
+    });
+
     if (typeof google !== 'undefined') {
         initializeGoogleSignIn();
     }

@@ -31,6 +31,31 @@ function showAdminSection(sectionId) {
     });
 }
 
+function setAdminShellVisibility(isAuthenticated) {
+    const sidebar = document.querySelector('.sidebar');
+    const content = document.querySelector('.content');
+    const topbar = document.querySelector('.topbar');
+    const authPanel = document.getElementById('adminAuthPanel');
+
+    if (sidebar) sidebar.classList.toggle('hidden', !isAuthenticated);
+    if (content) content.classList.toggle('hidden', !isAuthenticated);
+    if (topbar) topbar.classList.toggle('hidden', !isAuthenticated);
+    if (authPanel) authPanel.classList.toggle('hidden', isAuthenticated);
+}
+
+function setActiveAdminMenu(sectionId) {
+    const items = document.querySelectorAll('.sidebar-item[data-section]');
+    items.forEach(item => {
+        item.classList.toggle('active', item.getAttribute('data-section') === sectionId);
+    });
+}
+
+function openAdminDashboard(sectionId = 'overview') {
+    setAdminShellVisibility(true);
+    showAdminSection(sectionId);
+    setActiveAdminMenu(sectionId);
+}
+
 function activateSidebarMenu() {
     const items = document.querySelectorAll('.sidebar-item[data-section]');
     if (!items.length) return;
@@ -65,33 +90,17 @@ async function checkAdminAuth() {
         const response = await fetch('/auth/status', { credentials: 'include' });
         const data = await response.json();
         if (data.authenticated && data.user && data.user.role === 'admin') {
-            const sidebar = document.querySelector('.sidebar');
-            const content = document.querySelector('.content');
-            const topbar = document.querySelector('.topbar');
-            if (sidebar) sidebar.classList.remove('hidden');
-            if (content) content.classList.remove('hidden');
-            if (topbar) topbar.classList.remove('hidden');
-            const authPanel = document.getElementById('adminAuthPanel');
-            if (authPanel) authPanel.classList.add('hidden');
-            if (window.location.pathname !== '/admin.html') {
-                window.location.href = '/admin.html';
+            openAdminDashboard();
+            const isAdminPath = window.location.pathname === '/admin' || window.location.pathname === '/admin.html';
+            if (!isAdminPath) {
+                window.location.href = '/admin';
             }
         } else {
-            const sidebar = document.querySelector('.sidebar');
-            const content = document.querySelector('.content');
-            const topbar = document.querySelector('.topbar');
-            if (sidebar) sidebar.classList.add('hidden');
-            if (content) content.classList.add('hidden');
-            if (topbar) topbar.classList.add('hidden');
-            const authPanel = document.getElementById('adminAuthPanel');
-            if (authPanel) authPanel.classList.remove('hidden');
+            setAdminShellVisibility(false);
         }
     } catch (error) {
         console.error('Auth check failed:', error);
-        document.querySelector('.sidebar').classList.add('hidden');
-        document.querySelector('.content').classList.add('hidden');
-        document.querySelector('.topbar').classList.add('hidden');
-        document.getElementById('adminAuthPanel').classList.remove('hidden');
+        setAdminShellVisibility(false);
     }
 }
 
@@ -109,12 +118,10 @@ document.getElementById('adminLoginForm').addEventListener('submit', async funct
         });
         const data = await response.json();
         if (data.success) {
-            document.querySelector('.sidebar').classList.remove('hidden');
-            document.querySelector('.content').classList.remove('hidden');
-            document.querySelector('.topbar').classList.remove('hidden');
-            document.getElementById('adminAuthPanel').classList.add('hidden');
-            if (window.location.pathname !== '/admin.html') {
-                window.location.href = '/admin.html';
+            openAdminDashboard();
+            const isAdminPath = window.location.pathname === '/admin' || window.location.pathname === '/admin.html';
+            if (!isAdminPath) {
+                window.location.href = '/admin';
             }
         } else {
             alert(data.message || 'Invalid credentials');

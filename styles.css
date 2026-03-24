@@ -75,6 +75,10 @@ body {
     transition: background 0.3s ease, color 0.3s ease;
 }
 
+.hidden {
+    display: none !important;
+}
+
 /* ============================================================================
    NOTIFICATION SYSTEM
    ============================================================================ */
@@ -302,9 +306,11 @@ body {
     border-color: var(--link-border);
     transform: translateY(-2px);
 }
+
+.navbar-menu li.active a,
 .navbar-menu li .navbar-link.active {
-    background-color: transparent;
-    border-color: transparent;
+    background-color: var(--link-hover-bg);
+    border-color: var(--link-border);
     transform: none;
 }
 
